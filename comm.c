@@ -2262,7 +2262,7 @@ case CON_CONFIRM_NEW_NAME:
 	switch ( *argument )
 	{
 	case 'y': case 'Y':
-	    sprintf( buf, "New character.\n\rGive me a password for %s: %s",
+	    sprintf( buf, "\n\rNew character.\n\rGive me a password for %s: %s",
 		ch->name, echo_off_str );
             SET_BIT(ch->act, PLR_COLOUR);
 	    ch->pcdata->socket = str_dup( d->host );
@@ -2327,18 +2327,18 @@ case CON_CONFIRM_NEW_PASSWORD:
 	    d->connected = CON_GET_NEW_PASSWORD;
 	    return;
 	}
-	
-	write_to_buffer( d, "What is your sex (M/F)? ", 0 );
+
+	write_to_buffer( d, "\n\rWhat is your sex (M/F)? ", 0 );
     d->connected = CON_GET_NEW_SEX;
     break;
 
 case CON_GET_NEW_SEX:
 	switch ( argument[0] )
 	{
-	case 'm': case 'M': ch->sex = SEX_MALE;    
+	case 'm': case 'M': ch->sex = SEX_MALE;
 			    ch->pcdata->true_sex = SEX_MALE;
 			    break;
-	case 'f': case 'F': ch->sex = SEX_FEMALE; 
+	case 'f': case 'F': ch->sex = SEX_FEMALE;
 			    ch->pcdata->true_sex = SEX_FEMALE;
 			    break;
 
@@ -2348,7 +2348,7 @@ case CON_GET_NEW_SEX:
 	}
 
 	//	write_to_buffer( d, "Which side do you wish to join: (L)ight, (S)hadow, or (N)eutral?\n\r",0);
-	write_to_buffer( d, "What is your alignment (L/S/N)? ",0);
+	write_to_buffer( d, "\n\r\n\rWhat is your alignment (L/S/N)? ",0);
 	d->connected = CON_GET_ALIGNMENT;
 	break;
 
