@@ -339,6 +339,7 @@ const	struct	cmd_type	cmd_table	[] =
     /*
      * Miscellaneous commands.
      */
+    { "codetest",	do_codetest,	POS_DEAD,	IM,  1,  LOG_NORMAL, 1 },
     { "enter", 		do_enter, 	POS_STANDING,	 0,  1,  LOG_NORMAL, 1 },
     { "follow",		do_follow,	POS_RESTING,	 0,  1,  LOG_NORMAL, 1 },
     { "gain",		do_gain,	POS_STANDING,	 0,  1,  LOG_NORMAL, 1 },

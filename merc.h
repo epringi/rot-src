@@ -1177,30 +1177,30 @@ struct	kill_data
 #define OBJ_VNUM_DIAMOND	   3377
 #define OBJ_VNUM_QUESTSCROLL	   1204
 #define OBJ_VNUM_SURVIVAL_PACK	   1203
-#define OBJ_VNUM_SURVIVAL_A	   3009 
-#define OBJ_VNUM_SURVIVAL_B	   28801
-#define OBJ_VNUM_SURVIVAL_C	   28814
-#define OBJ_VNUM_SURVIVAL_D	   28805
-#define OBJ_VNUM_SURVIVAL_E	   3076
-#define OBJ_VNUM_SURVIVAL_F	   28806
-#define OBJ_VNUM_SURVIVAL_G	   3097
-#define OBJ_VNUM_SURVIVAL_H	   28815
-#define OBJ_VNUM_SURVIVAL_I	   28807 
-#define OBJ_VNUM_SURVIVAL_J	   28816
-#define OBJ_VNUM_SURVIVAL_L	   28803
-#define OBJ_VNUM_SURVIVAL_K	   3162
-#define OBJ_VNUM_SURVIVAL_M	   28808 
-#define OBJ_VNUM_SURVIVAL_N	   28817 
-#define OBJ_VNUM_SURVIVAL_O	   28819 
-#define OBJ_VNUM_SURVIVAL_P	   5232
-#define OBJ_VNUM_SURVIVAL_Q	   28818 
-#define OBJ_VNUM_SURVIVAL_R	   28810 
-#define OBJ_VNUM_SURVIVAL_S	   28813 
-#define OBJ_VNUM_SURVIVAL_T	   28811 
-#define OBJ_VNUM_SURVIVAL_U	   28802 
-#define OBJ_VNUM_SURVIVAL_V	   28812 
-#define OBJ_VNUM_SURVIVAL_W	   9222
-#define OBJ_VNUM_SURVIVAL_X	   6013
+#define OBJ_VNUM_SURVIVAL_A	   3009  // Food
+#define OBJ_VNUM_SURVIVAL_B	   28801 // Weapon (sword type)
+#define OBJ_VNUM_SURVIVAL_C	   28814 // Shroud (about body)
+#define OBJ_VNUM_SURVIVAL_D	   28805 // Visor (face)
+#define OBJ_VNUM_SURVIVAL_E	   3076  // Gloves
+#define OBJ_VNUM_SURVIVAL_F	   28806 // Arm plate
+#define OBJ_VNUM_SURVIVAL_G	   3097  // Shield
+#define OBJ_VNUM_SURVIVAL_H	   28815 // Helmet
+#define OBJ_VNUM_SURVIVAL_I	   28807 // Girth (waist)
+#define OBJ_VNUM_SURVIVAL_J	   28816 // Boots
+#define OBJ_VNUM_SURVIVAL_L	   28803 // Dagger
+#define OBJ_VNUM_SURVIVAL_K	   3162  // Map (a double)
+#define OBJ_VNUM_SURVIVAL_M	   28808 // Leg plate
+#define OBJ_VNUM_SURVIVAL_N	   28817 // Belt pouch (waist)
+#define OBJ_VNUM_SURVIVAL_O	   28819 // Wrist
+#define OBJ_VNUM_SURVIVAL_P	   5232  // Light
+#define OBJ_VNUM_SURVIVAL_Q	   28818 // Key (?)
+#define OBJ_VNUM_SURVIVAL_R	   28810 // Ring
+#define OBJ_VNUM_SURVIVAL_S	   28813 // Breastplate
+#define OBJ_VNUM_SURVIVAL_T	   28811 // Talisman (neck)
+#define OBJ_VNUM_SURVIVAL_U	   28802 // Sword
+#define OBJ_VNUM_SURVIVAL_V	   28812 // Cloak (neck)
+#define OBJ_VNUM_SURVIVAL_W	   9222  // Light
+#define OBJ_VNUM_SURVIVAL_X	   6013  // Water
 /*
 #define OBJ_VNUM_SURVIVAL_PACK	   1203
 #define OBJ_VNUM_SURVIVAL_A	   1304
@@ -1432,6 +1432,14 @@ struct	kill_data
 #define CONT_CLOSED		      4
 #define CONT_LOCKED		      8
 #define CONT_PUT_ON		     16
+
+
+
+/*
+ * Multiple use area virtual numbers.
+ * Found in ch->in_room->area->vnum.
+ */
+#define AREA_VNUM_SCHOOL	      3
 
 
 

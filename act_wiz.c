@@ -88,6 +88,27 @@ DECLARE_DO_FUN(do_stance_set	);
 bool	write_to_descriptor args( ( int desc, char *txt, int length ) );
 
 /*
+ * do_codetest
+ * Just for testing.
+ */
+
+void do_codetest( CHAR_DATA *ch, char *argument ){
+   char buf[MSL];
+
+
+if(ch->in_room->area->vnum){
+  send_to_char("Yes?", ch);
+   sprintf(buf, "Zone: %d", ch->in_room->area->vnum);
+   send_to_char(buf, ch);
+}
+else{
+  send_to_char(":(", ch);
+}
+
+   return;
+}
+
+/*
  * Local functions.
  */
 
@@ -96,7 +117,7 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
    int flag;
    char buf[MAX_STRING_LENGTH];
    int col = 0;
-                
+
    if ( argument[0] == '\0' )
 /* Show wiznet options - just like channel command */
    {
@@ -105,14 +126,14 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
         send_to_char("---------------------\n\r",ch);
         /* list of all wiznet options */
         buf[0] = '\0';
-        
+
         for (flag = 0; wiznet_table[flag].name != NULL; flag++)
         {
             if (wiznet_table[flag].level <= get_trust(ch))
             {
                 sprintf( buf, "%-14s %s\t", wiznet_table[flag].name,
 		IS_SET(ch->wiznet,wiznet_table[flag].flag) ? "{RON{V" : "OFF" );
-                send_to_char(buf, ch);   
+                send_to_char(buf, ch);
                 col++;
                 if (col==3)
                 {
@@ -124,25 +145,25 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
 /* To avoid color bleeding */
      send_to_char("{x",ch);
      return;
-   }    
- 
+   }
+
    if (!str_prefix(argument,"on"))
-   {     
+   {
         send_to_char("{VWelcome to Wiznet!{x\n\r",ch);
         SET_BIT(ch->wiznet,WIZ_ON);
         return;
    }
-                
+
    if (!str_prefix(argument,"off"))
    {
         send_to_char("{VSigning off of Wiznet.{x\n\r",ch);
         REMOVE_BIT(ch->wiznet,WIZ_ON);
         return;
    }
-        
+
    flag = wiznet_lookup(argument);
-        
-   if (flag == -1 || get_trust(ch) < wiznet_table[flag].level) 
+
+   if (flag == -1 || get_trust(ch) < wiznet_table[flag].level)
    {
         send_to_char("{VNo such option.{x\n\r",ch);
         return;
@@ -156,7 +177,7 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
         REMOVE_BIT(ch->wiznet,wiznet_table[flag].flag);
         return;
    }
-   else  
+   else
    {
         sprintf(buf,"{VYou will now see %s on wiznet.{x\n\r",
                 wiznet_table[flag].name);
@@ -451,7 +472,7 @@ void do_outfit ( CHAR_DATA *ch, char *argument )
         equip_char( ch, obj, WEAR_LIGHT );
 	act("$g gives you a light.",ch,NULL,NULL,TO_CHAR);
     }
- 
+
     if ( ( obj = get_eq_char( ch, WEAR_BODY ) ) == NULL )
     {
         if (ch->carry_number + 1 > can_carry_n(ch))
@@ -469,7 +490,7 @@ void do_outfit ( CHAR_DATA *ch, char *argument )
     /* do the weapon thing */
     if ((obj = get_eq_char(ch,WEAR_WIELD)) == NULL)
     {
-    	sn = 0; 
+    	sn = 0;
     	vnum = OBJ_VNUM_SCHOOL_SWORD; /* just in case! */
 
         if (ch->carry_number + 1 > can_carry_n(ch))
@@ -511,33 +532,33 @@ void do_outfit ( CHAR_DATA *ch, char *argument )
     }
 }
 
-     
+
 /* RT nochannels command, for those spammers */
 void do_nochannels( CHAR_DATA *ch, char *argument )
 {
     char arg[MIL], buf[MSL];
     CHAR_DATA *victim;
- 
+
     one_argument( argument, arg );
- 
+
     if ( arg[0] == '\0' )
     {
         send_to_char( "Nochannel whom?", ch );
         return;
     }
- 
+
     if ( ( victim = get_char_world( ch, arg ) ) == NULL )
     {
         send_to_char( "They aren't here.\n\r", ch );
         return;
     }
- 
+
     if ( victim->level >= ch->level )
     {
         send_to_char( "You failed.\n\r", ch );
         return;
     }
- 
+
     if ( IS_SET(victim->comm, COMM_NOCHANNELS) )
     {
         REMOVE_BIT(victim->comm, COMM_NOCHANNELS);
@@ -556,7 +577,7 @@ void do_nochannels( CHAR_DATA *ch, char *argument )
 	sprintf(buf,"$N revokes %s's channels.",victim->name);
 	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
- 
+
     return;
 }
 
@@ -5328,7 +5349,7 @@ void do_rename( CHAR_DATA *ch, char *argument )
 
     if ( check_char_exist( arg2 ) )
     {
-	send_to_char( "That name is already in use, or is illegal.\n\r", ch );
+	send_to_char( "That name is already in use, or is disallowed.\n\r", ch );
 	return;
     }
     sprintf(name, "%s", str_dup(capitalize(arg2)));
@@ -6503,12 +6524,12 @@ void do_pack ( CHAR_DATA *ch, char *argument )
 	obj->level = 5;
 	obj_to_obj( obj, pack );
     }
-    for (i = 0; i < 2; i++)
+    /*for (i = 0; i < 2; i++)
     {
 	obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_B), 0 );
 	obj->level = 5;
 	obj_to_obj( obj, pack );
-    }
+    }*/
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_C), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
@@ -6521,9 +6542,9 @@ void do_pack ( CHAR_DATA *ch, char *argument )
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_F), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_G), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_G), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_H), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
@@ -6533,57 +6554,57 @@ void do_pack ( CHAR_DATA *ch, char *argument )
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_J), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_K), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_L), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_K), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_L), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_M), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_N), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_N), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
     for (i = 0; i < 2; i++)
     {
 	obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_O), 0 );
 	obj->level = 5;
 	obj_to_obj( obj, pack );
     }
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_P), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_Q), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_P), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_Q), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
     for (i = 0; i < 2; i++)
     {
 	obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_R), 0 );
 	obj->level = 5;
 	obj_to_obj( obj, pack );
     }
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_S), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_T), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
-    for (i = 0; i < 2; i++)
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_S), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_T), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
+    /*for (i = 0; i < 2; i++)
     {
 	obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_U), 0 );
 	obj->level = 5;
 	obj_to_obj( obj, pack );
-    }
+    }*/
     for (i = 0; i < 2; i++)
     {
 	obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_V), 0 );
 	obj->level = 5;
 	obj_to_obj( obj, pack );
     }
-    obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_W), 0 );
-    obj->level = 5;
-    obj_to_obj( obj, pack );
+    //obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_W), 0 );
+    //obj->level = 5;
+    //obj_to_obj( obj, pack );
     obj = create_object( get_obj_index(OBJ_VNUM_SURVIVAL_X), 0 );
     obj->level = 5;
     obj_to_obj( obj, pack );
@@ -6728,7 +6749,7 @@ void do_dupe(CHAR_DATA *ch, char *argument)
 	send_to_char("Sorry, they've reached the limit for dupes.\n\r",ch);
 	return;
      }
-  
+
      /* make a new dupe */
      victim->pcdata->dupes[pos]		= str_dup(arg2);
      sprintf(buf,"%s now has the dupe %s set.\n\r",victim->name,arg2);
@@ -6738,7 +6759,7 @@ void do_dupe(CHAR_DATA *ch, char *argument)
 #define CH(descriptor)  ((descriptor)->original ? \
 	      (descriptor)->original : (descriptor)->character)
 #define COPYOVER_FILE "copyover.data"
-#define EXE_FILE      "../src/ROT2"
+#define EXE_FILE      "../area/ROT2"
 
 
 /*  Copyover - Original idea: Fusion of MUD++
@@ -6756,9 +6777,9 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 	DESCRIPTOR_DATA *d, *d_next;
 	char buf [100], buf2[100];
 	extern int port,control; /* db.c */
-									
+
 	fp = fopen (COPYOVER_FILE, "w");
-										
+
 	if (!fp)
 	{
 		send_to_char ("Copyover file not writeable, aborted.\n\r",ch);

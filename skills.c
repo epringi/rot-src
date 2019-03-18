@@ -1035,7 +1035,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
     char arg[MIL];
     char buf[100];
     int gn,sn,i;
- 
+
     if (argument[0] == '\0')
 	return FALSE;
 
@@ -1047,12 +1047,11 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
     if (!str_prefix(arg,"help"))
     {
 	if (argument[0] == '\0')
-	{
 	    do_help(ch,"group help");
-	    return TRUE;
-	}
+        else
+            do_help(ch,argument);
 
-        do_help(ch,argument);
+        send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	return TRUE;
     }
 
@@ -1140,6 +1139,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
 			group_table[gn].rating[ch->clasb]);
 		}
 	    }
+            send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	    return TRUE;
 	}
 
@@ -1313,30 +1313,34 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
     if (!str_prefix(arg,"premise"))
     {
 	do_help(ch,"premise");
+        send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	return TRUE;
     }
 
     if (!str_prefix(arg,"list"))
     {
 	list_group_costs(ch);
+        send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	return TRUE;
     }
 
     if (!str_prefix(arg,"learned"))
     {
 	list_group_chosen(ch);
+        send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	return TRUE;
     }
 
     if (!str_prefix(arg,"info"))
     {
 	do_groups(ch,argument);
+        send_to_char("Choices are: list, learned, premise, add, drop, info, help, and done: ", ch);
 	return TRUE;
     }
 
     return FALSE;
 }
-        
+
 
 /* shows all groups, or the sub-members of a group */
 void do_groups(CHAR_DATA *ch, char *argument)

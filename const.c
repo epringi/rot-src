@@ -44,8 +44,8 @@ DECLARE_SPELL_FUN(spell_rasp);
 
 char *	const	dir_name	[]		=
 {
-    "{WN{Dorth{x", "{WE{Dast{x", "{WS{Douth{x", "{WW{Dest{x", "{WU{Dp{x", "{WD{Down{x",
-    "{WN{Dorth{x", "{We{Dast{x", "{WS{Douth{x", "{WW{Dest{x", "{Wu{Dp{x", "{WD{Down{x"
+    "{wNorth{x", "{wEast{x", "{wSouth{x", "{wWest{x", "{wUp{x", "{wDown{x",
+    "{wNorth{x", "{weast{x", "{wSouth{x", "{wWest{x", "{wup{x", "{wDown{x"
 };
 
 const	sh_int	rev_dir		[]		=

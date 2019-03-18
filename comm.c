@@ -377,7 +377,7 @@ void	nanny			args( ( DESCRIPTOR_DATA *d, char *argument ) );
 bool	process_output		args( ( DESCRIPTOR_DATA *d, bool fPrompt ) );
 void	read_from_buffer	args( ( DESCRIPTOR_DATA *d ) );
 void	stop_idling		args( ( CHAR_DATA *ch ) );
-void    bust_a_prompt           args( ( CHAR_DATA *ch ) );
+void    bust_a_prompt           args( ( DESCRIPTOR_DATA *d ) );
 int port, control;
 
 
@@ -1523,7 +1523,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 {
 	extern bool merc_down;
-	
+
 	/*
 	* Bust a prompt.
 	*/
@@ -1535,13 +1535,13 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 	{
 		CHAR_DATA *ch;
 		CHAR_DATA *victim;
-		
+
 		if( d->pString )
-			write_to_buffer( d, "> ", 2 );			
+			write_to_buffer( d, "> ", 2 );
 		else
 		{
 			ch = d->character;
-			
+
 			/* battle prompt */
 			if ((victim = ch->fighting) != NULL && can_see(ch,victim))
 			{
@@ -1550,12 +1550,12 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 				char *pbuff;
 				char buf[MAX_STRING_LENGTH];
 				char buffer[MAX_STRING_LENGTH*2];
-				
-				if (victim->max_hit > 0) 
+
+				if (victim->max_hit > 0)
 					percent = victim->hit * 100 / victim->max_hit;
 				else
 					percent = -1;
-				
+
 				if (percent >= 100)
 					sprintf(wound,"is in excellent condition.");
 				else if (percent >= 90)
@@ -1572,7 +1572,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 					sprintf(wound,"is in awful condition.");
 				else
 					sprintf(wound,"is bleeding to death.");
-				
+
 				sprintf(buf,"%s %s \n\r", 
 					IS_NPC(victim) ? victim->short_descr : victim->name,wound);
 				buf[0]	= UPPER( buf[0] );
@@ -1580,15 +1580,14 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 				colourconv( pbuff, buf, d->character );
 				write_to_buffer( d, buffer, 0);
 			}
-			
+
 			ch = d->original ? d->original : d->character;
 			if (!IS_SET(ch->comm, COMM_COMPACT) )
 				write_to_buffer( d, "\n\r", 2 );
-			
-			
+
 			if ( IS_SET(ch->comm, COMM_PROMPT) )
-				bust_a_prompt( d->character );
-			
+				bust_a_prompt( d );
+
 			if (IS_SET(ch->comm,COMM_TELNET_GA))
 				write_to_buffer(d,go_ahead_str,0);
 		}
@@ -1599,7 +1598,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 	*/
 	if ( d->outtop == 0 )
 		return TRUE;
-	
+
 		/*
 		* Snoop-o-rama.
 	*/
@@ -1610,7 +1609,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 		write_to_buffer( d->snoop_by, "> ", 2 );
 		write_to_buffer( d->snoop_by, d->outbuf, d->outtop );
 	}
-	
+
 	/*
 	* OS-dependent output.
 	*/
@@ -1630,7 +1629,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
  * Bust a prompt (player settable prompt)
  * coded by Morgenes for Aldara Mud
  */
-void bust_a_prompt (CHAR_DATA * ch)
+void bust_a_prompt (DESCRIPTOR_DATA *d)
 {
     char buf[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
@@ -1641,9 +1640,12 @@ void bust_a_prompt (CHAR_DATA * ch)
     char buffer[MAX_STRING_LENGTH * 2];
     char doors[MAX_INPUT_LENGTH];
     EXIT_DATA *pexit;
+    CHAR_DATA *ch;
     bool found;
-    const char *dir_name[] = {"north","east","south","west","up","down"};
+    const char *dir_name[] = {"n","e","s","w","u","d"};
     int door;
+
+    ch=d->character;
 
     point = buf;
     str = ch->prompt;
@@ -1687,6 +1689,9 @@ void bust_a_prompt (CHAR_DATA * ch)
                         && !IS_SET (pexit->exit_info, EX_CLOSED))
                     {
                         found = TRUE;
+                        if(door >= 1){
+                            strcat (doors, ",");
+                        }
                         strcat (doors, dir_name[door]);
                     }
                 }
@@ -1697,7 +1702,7 @@ void bust_a_prompt (CHAR_DATA * ch)
                 break;
             case 'c': sprintf (buf2, "%s", "\n\r"); i = buf2; break;
             case 'h': sprintf (buf2, "%d", ch->hit); i = buf2; break;
-            case 'q': 
+            case 'q':
 
 if ( global_prq && global_xpq && global_damq    ){ sprintf (buf2, "PRQx2 XPx2 DAMx2"); i = buf2; break; }
 else if ( !global_prq && !global_xpq && !global_damq ){ sprintf (buf2, "off"); i = buf2; break; }
@@ -1856,6 +1861,12 @@ else if ( !global_xpq  ){ sprintf (buf2, "off"); i = buf2; break; }
                 sprintf (buf2, "%s", olc_ed_vnum (ch));
                 i = buf2;
                 break;
+           case 'B':
+                if(ch->fighting){
+                    sprintf(buf2, "%d%%", d->character->fighting->hit * 100 / d->character->fighting->max_hit);
+                    i = buf2;
+                }
+                break;
         }
         ++str;
         while ((*point = *i) != '\0')
@@ -1970,7 +1981,7 @@ bool write_to_descriptor( int desc, char *txt, int length )
  */
 void nanny( DESCRIPTOR_DATA *d, char *argument )
 {
-    DESCRIPTOR_DATA *dt; 
+    DESCRIPTOR_DATA *dt;
     DESCRIPTOR_DATA *d_old, *d_next;
     MUD_DATA *pmud;
     char buf[MSL];
@@ -1999,7 +2010,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	close_socket( d );
 	return;
 
-case CON_GET_NAME:
+    case CON_GET_NAME:
 	if ( argument[0] == '\0' )
 	{
 	    close_socket( d );
@@ -2009,11 +2020,11 @@ case CON_GET_NAME:
 	argument[0] = UPPER(argument[0]);
 	if ( !check_parse_name( argument ) )
 	{
-	    write_to_buffer( d, "Illegal name, try another.\n\r", 0 );
+	    write_to_buffer( d, "Disallowed name, try another.\n\r", 0 );
 	    write_to_buffer( d, "(If you've used this name here before, and are no\n\r", 0 );
 	    write_to_buffer( d, " longer able to, it may be because we've added a\n\r", 0 );
-	    write_to_buffer( d, " new mobile that uses the same name. Log in with\n\r", 0 );
-	    write_to_buffer( d, " a new name, and let an IMM know, and we will fix it.)\n\r", 0 );
+	    write_to_buffer( d, " new NPC that uses the same name. Log in with\n\r", 0 );
+	    write_to_buffer( d, " a new name, and let an Immortal know, and we will fix it.)\n\r", 0 );
 	    write_to_buffer( d, "\n\rName: ", 0 );
 	    return;
 	}
@@ -2056,7 +2067,7 @@ case CON_GET_NAME:
 	}
 	else
 	{
-	    if ( wizlock && !IS_IMMORTAL(ch)) 
+	    if ( wizlock && !IS_IMMORTAL(ch))
 	    {
 		write_to_buffer( d, "The game is wizlocked.\n\r", 0 );
 		close_socket( d );
@@ -2090,13 +2101,13 @@ case CON_GET_NAME:
 		return;
 	    }
 
-	    sprintf( buf, "\n\rNOTICE: This mud requires role-playing type names, If your\n\r");
+	    sprintf( buf, "\n\rNOTICE: This mud is a role-playing mud in the flavour of D&D and Tolkien,\n\r");
 	    write_to_buffer( d, buf, 0 );
-	    sprintf( buf, "chosen name does not conform to this, your character will be deleted.\n\r");
+	    sprintf( buf, "please be sure to name yourself accordingly.  Nothing like 'MrDude2018'.\n\r");
 	    write_to_buffer( d, buf, 0 );
 	    sprintf( buf, "https://www.fantasynamegenerators.com/dungeons-and-dragons.php can help.\n\r");
 	    write_to_buffer( d, buf, 0 );
-	    sprintf( buf, "Did I get that right, %s (Y/N)? ", argument );
+	    sprintf( buf, "Are you satisfied with the name %s? (y/n):  ", argument );
 	    /* Stop multiple logins of the same name */
             for (dt=descriptor_list; dt != NULL; dt=dt->next)
                   if (d != dt && dt->character != NULL
@@ -2115,10 +2126,10 @@ case CON_GET_NAME:
 	}
 	break;
 
-case CON_GET_OLD_PASSWORD:
-#if defined(unix)
+    case CON_GET_OLD_PASSWORD:
+    #if defined(unix)
 	write_to_buffer( d, "\n\r", 2 );
-#endif
+    #endif
 
 	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ))
 	{
@@ -2126,7 +2137,7 @@ case CON_GET_OLD_PASSWORD:
 	    close_socket( d );
 	    return;
 	}
- 
+
 	write_to_buffer( d, echo_on_str, 0 );
 
 	if (check_playing(d,ch->name))
@@ -2136,7 +2147,7 @@ case CON_GET_OLD_PASSWORD:
 	if ( check_reconnect( d, ch->name, TRUE ) )
 	    return;
 
-	sprintf( log_buf, "%s@%s has joined 'RoT2'", ch->name, d->host );
+	sprintf( log_buf, "%s@%s has joined the game", ch->name, d->host );
 	log_string( log_buf );
 	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
         SET_BIT(ch->act, PLR_COLOUR);
@@ -2159,9 +2170,9 @@ case CON_GET_OLD_PASSWORD:
 	    ch->pcdata->pwd	= str_dup( newbuf );
 	    newbuf[0] = '\0';
 		if (IS_SET(act, PLR_SECOND ) )
-			 ch->pcdata->tier = 1; 		
+			 ch->pcdata->tier = 1;
 	    else
-			 ch->pcdata->tier = 2; 		
+			 ch->pcdata->tier = 2;
 	    ch->pcdata->socket = str_dup( d->host );
 	    write_to_buffer( d, echo_on_str, 0 );
 /*
@@ -2184,12 +2195,12 @@ case CON_GET_OLD_PASSWORD:
  */
 	    newbuf[0] = '\0';
 	    // write_to_buffer(d,"What is your race (help for more information)? ",0);
-	write_to_buffer( d, "What is your sex (M/F)? ", 0 );
+	write_to_buffer( d, "What is your sex, (M)ale or (F)emale? ", 0 );
 	    d->connected = CON_GET_NEW_SEX;
 	    break;
 	}
        if (IS_IMMORTAL(ch)) {
-           write_to_buffer(d, "Would you like to login (W)izi, (I)ncog, or (N)ormal? ", 0);
+           write_to_buffer(d, "Would you like to login (W)izi, (I)ncognito, or (N)ormal? ", 0);
 	    d->connected = CON_GET_WIZI;
           break;
        } else {
@@ -2210,9 +2221,9 @@ case CON_GET_OLD_PASSWORD:
 
 	break;
 
-/* RT code for breaking link */
- 
-case CON_BREAK_CONNECT:
+    /* RT code for breaking link */
+
+    case CON_BREAK_CONNECT:
 	switch( *argument )
 	{
 	case 'y' : case 'Y':
@@ -2258,11 +2269,11 @@ case CON_BREAK_CONNECT:
 	}
 	break;
 
-case CON_CONFIRM_NEW_NAME:
+    case CON_CONFIRM_NEW_NAME:
 	switch ( *argument )
 	{
 	case 'y': case 'Y':
-	    sprintf( buf, "\n\rNew character.\n\rGive me a password for %s: %s",
+	    sprintf( buf, "\n\rWelcome!\n\r\n\rType a password for %s: %s",
 		ch->name, echo_off_str );
             SET_BIT(ch->act, PLR_COLOUR);
 	    ch->pcdata->socket = str_dup( d->host );
@@ -2271,7 +2282,7 @@ case CON_CONFIRM_NEW_NAME:
 	    break;
 
 	case 'n': case 'N':
-	    write_to_buffer( d, "Ok, what IS it, then? ", 0 );
+	    write_to_buffer( d, "Ok, what name would you like to go by? ", 0 );
 	    nuke_pets( d->character );
 	    free_char( d->character );
 	    d->character = NULL;
@@ -2284,10 +2295,10 @@ case CON_CONFIRM_NEW_NAME:
 	}
 	break;
 
-case CON_GET_NEW_PASSWORD:
-#if defined(unix)
+    case CON_GET_NEW_PASSWORD:
+    #if defined(unix)
 	write_to_buffer( d, "\n\r", 2 );
-#endif
+    #endif
 
 	if ( strlen(argument) < 5 )
 	{
@@ -2315,10 +2326,10 @@ case CON_GET_NEW_PASSWORD:
 	d->connected = CON_CONFIRM_NEW_PASSWORD;
 	break;
 
-case CON_CONFIRM_NEW_PASSWORD:
-#if defined(unix)
+    case CON_CONFIRM_NEW_PASSWORD:
+    #if defined(unix)
 	write_to_buffer( d, "\n\r", 2 );
-#endif
+    #endif
 
 	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ) )
 	{
@@ -2332,7 +2343,7 @@ case CON_CONFIRM_NEW_PASSWORD:
     d->connected = CON_GET_NEW_SEX;
     break;
 
-case CON_GET_NEW_SEX:
+    case CON_GET_NEW_SEX:
 	switch ( argument[0] )
 	{
 	case 'm': case 'M': ch->sex = SEX_MALE;
@@ -2348,19 +2359,19 @@ case CON_GET_NEW_SEX:
 	}
 
 	//	write_to_buffer( d, "Which side do you wish to join: (L)ight, (S)hadow, or (N)eutral?\n\r",0);
-	write_to_buffer( d, "\n\r\n\rWhat is your alignment (L/S/N)? ",0);
+	write_to_buffer( d, "\n\r\n\rWhat is your moral alignment:  (E)vil, (N)eutral, or (G)ood? ",0);
 	d->connected = CON_GET_ALIGNMENT;
 	break;
 
-case CON_GET_ALIGNMENT:
+    case CON_GET_ALIGNMENT:
 	switch( argument[0])
 	{
-	    case 'l' : case 'L' : ch->alignment = 750;  break;
+	    case 'g' : case 'G' : ch->alignment = 750;  break;
 	    case 'n' : case 'N' : ch->alignment = 0;	break;
-	    case 's' : case 'S' : ch->alignment = -750; break;
+	    case 'e' : case 'E' : ch->alignment = -750; break;
 	    default:
 		write_to_buffer(d,"That's not a valid alignment.\n\r",0);
-		write_to_buffer(d,"Which alignment (L/N/S)? ",0);
+		write_to_buffer(d,"Which alignment (E/N/G)? ",0);
 		return;
 	}
 
@@ -2368,19 +2379,20 @@ case CON_GET_ALIGNMENT:
 	write_to_buffer( d, echo_on_str, 0 );
 	pos = 0;
 	newbuf[0] = '\0';
-	write_to_buffer(d,"The following races are available:\n\r\n\r",0);
+	write_to_buffer(d,"\n\rThe following races are available:\n\r\n\r",0);
 	pos = 0;
 	for ( race = 1; race_table[race].name != NULL; race++ )
 	{
 	    if (!race_table[race].pc_race)
 		break;
-	    sprintf(newbuf, "%6s%-24s", " ", race_table[race].name);
+
+	    sprintf(newbuf, "%6s%-24s", " ", capitalize(race_table[race].name));
 	    write_to_buffer(d,newbuf,0);
-	    pos++; 
-	    if (pos >= 2) { 
+	    pos++;
+	    if (pos >= 2) {
 		write_to_buffer(d,"\n\r",1);
 		pos = 0;
-	    } 
+	    }
 	}
 	newbuf[0] = '\0';
 	write_to_buffer(d,"\n\r\n\r",0);
@@ -2388,7 +2400,7 @@ case CON_GET_ALIGNMENT:
 	d->connected = CON_GET_NEW_RACE;
 	break;
 
-case CON_GET_NEW_RACE:
+    case CON_GET_NEW_RACE:
 	one_argument(argument,arg);
 
 
@@ -2399,8 +2411,8 @@ case CON_GET_NEW_RACE:
 		do_help(ch,"race help");
 	    else
 		do_help(ch,argument);
-            write_to_buffer(d,
-		"What is your race (help for more information)? ",0);
+
+            write_to_buffer(d, "What race do you choose? (help for more information): ",0);
 	    break;
   	}
 
@@ -2414,12 +2426,15 @@ case CON_GET_NEW_RACE:
             {
             	if (!race_table[race].pc_race)
                     break;
-            	write_to_buffer(d,race_table[race].name,0);
+            	write_to_buffer(d,capitalize(race_table[race].name),0);
+                if(race==1)
+            	    write_to_buffer(d,",",1);
+
             	write_to_buffer(d," ",1);
             }
             write_to_buffer(d,"\n\r",0);
             write_to_buffer(d,
-		"What is your race? (help for more information) ",0);
+		"What race do you choose? (help for more information): ",0);
 	    break;
 	}
 
@@ -2427,6 +2442,7 @@ case CON_GET_NEW_RACE:
 	/* initialize stats */
 	for (i = 0; i < MAX_STATS; i++)
 	    ch->perm_stat[i] = pc_race_table[race].stats[i];
+
 	ch->affected_by = ch->affected_by|race_table[race].aff;
 	ch->shielded_by = ch->shielded_by|race_table[race].shd;
 	ch->imm_flags	= ch->imm_flags|race_table[race].imm;
@@ -2449,66 +2465,79 @@ case CON_GET_NEW_RACE:
 	//Choose Class
 		write_to_buffer( d, echo_on_str, 0 );
 	if (ch->pcdata->tier >= 2)
-	write_to_buffer(d,"The following primary classes are available:\n\r\n\r",0);
+	write_to_buffer(d,"\n\rThe following primary classes are available:\n\r\n\r",0);
 	else
-	write_to_buffer(d,"The following classes are available:\n\r\n\r",0);
+	write_to_buffer(d,"\n\rThe following classes are available:\n\r\n\r",0);
 	if (ch->pcdata->tier < 1) {
 	    ch->pcdata->tier = 0;
 	    for ( iClass = 0; iClass < MCLT_1; iClass++ )
 	    {
 		write_to_buffer(d,"      ",0);
-		write_to_buffer(d,class_table[iClass].name,0);
-		write_to_buffer(d,"\n\r",1);
+		write_to_buffer(d,capitalize(class_table[iClass].name),0);
+		write_to_buffer(d,"\n\r",0);
 	    }
 	} else {
 	    for ( iClass = MCLT_1; iClass < MAX_CLASS; iClass++ )
 	    {
 		write_to_buffer(d,"      ",0);
-		write_to_buffer(d,class_table[iClass].name,0);
-		write_to_buffer(d,"\n\r",1);
+		write_to_buffer(d,capitalize(class_table[iClass].name),0);
+		write_to_buffer(d,"\n\r",0);
 	    }
 	}
-	write_to_buffer(d,"\n\r\n\r",0);
+	write_to_buffer(d,"\n\r",0);
 	if (ch->pcdata->tier >= 2)
-	    write_to_buffer(d,"What is your PRIMARY class ? ",0);
+	    write_to_buffer(d,"What do you choose for your Primary class? (help for more information): ",0);
 	else
-	    write_to_buffer(d,"What is your class ? ",0);
+	    write_to_buffer(d,"What class do you choose? (help for more information): ",0);
 	d->connected = CON_GET_NEW_CLASS;
 	break;
 
-case CON_GET_NEW_CLASS:
-	iClass = class_lookup(argument);
+    case CON_GET_NEW_CLASS:
+	one_argument(argument,arg);
 
+	if (!strcmp(arg,"help"))
+	{
+	    //argument = one_argument(argument,arg);
+	  //  if (argument[0] == '\0')
+		do_help(ch,"class help");
+	    //else
+	//	do_help(ch,argument);
+
+            write_to_buffer(d, "What class do you choose? (help for more information): ",0);
+	    break;
+  	}
+
+	iClass = class_lookup(argument);
 	if ( iClass == -1 )
 	{
 	    write_to_buffer( d,
-		"That's not a class.\n\rWhat IS your class? ", 0 );
+		"That's not a class.\n\rWhat class do you choose? (help for more information): ", 0 );
 	    return;
 	}
-	if (ch->pcdata->tier < 1) 
+	if (ch->pcdata->tier < 1)
 	{
-	    if (iClass >= (MCLT_1)) 
+	    if (iClass >= (MCLT_1))
 		{
 		write_to_buffer( d,
-		    "That's not a first tier class.\n\rWhat IS your class? ", 0 );
-		return;
-	    }
-	} 
-	else if (ch->pcdata->tier < 2) 
-	{
-	    if (iClass < (MCLT_1)) 
-		{
-		write_to_buffer( d,
-		    "That's not a second tier class.\n\rWhat IS your class? ", 0 );
+		    "That's not a first tier class.\n\rWhat class do you choose? (help for more information): ", 0 );
 		return;
 	    }
 	}
-	else 
+	else if (ch->pcdata->tier < 2)
 	{
-	    if (iClass < (MCLT_1)) 
+	    if (iClass < (MCLT_1))
 		{
 		write_to_buffer( d,
-		    "That's not a second tier class.\n\rWhat IS your class? ", 0 );
+		    "That's not a second tier class.\n\rWhat class do you choose? (help for more information): ", 0 );
+		return;
+	    }
+	}
+	else
+	{
+	    if (iClass < (MCLT_1))
+		{
+		write_to_buffer( d,
+		    "That's not a second tier class.\n\rWhat class do you choose? (help for more information): ", 0 );
 		return;
 	    }
 	}
@@ -2517,7 +2546,7 @@ case CON_GET_NEW_CLASS:
 	    ch->newbie = 1;
 	}
 
-	if (ch->pcdata->tier == 2) 
+	if (ch->pcdata->tier == 2)
 	{
 	write_to_buffer( d, echo_on_str, 0 );
 	write_to_buffer(d,"The following secondary classes are available:\n\r\n\r",0);
@@ -2530,12 +2559,12 @@ case CON_GET_NEW_CLASS:
 		write_to_buffer(d,"\n\r",1);
 	    }
 	    write_to_buffer(d,"\n\r\n\r",0);
-	    write_to_buffer(d,"What is your SECONDARY class ? ",0);
+	    write_to_buffer(d,"What do you choose as your Secondary class? (help for more information): ",0);
 	    d->connected = CON_GET_SECOND_CLASS;
 	    break;
 	}
 
-	if (ch->pcdata->tier == 3) 
+	if (ch->pcdata->tier == 3)
 	{
 	write_to_buffer( d, echo_on_str, 0 );
 	write_to_buffer(d,"The following secondary classes are available:\n\r\n\r",0);
@@ -2548,7 +2577,7 @@ case CON_GET_NEW_CLASS:
 		write_to_buffer(d,"\n\r",1);
 	    }
 	    write_to_buffer(d,"\n\r\n\r",0);
-	    write_to_buffer(d,"What is your SECONDARY class ? ",0);
+	    write_to_buffer(d,"What do you choose as your Secondary class? (help for more information): ",0);
 	    d->connected = CON_GET_SECOND_CLASS;
 	    break;
 	}
@@ -2575,32 +2604,46 @@ case CON_GET_NEW_CLASS:
 	write_to_buffer(d,"Customize (Y/N)? ",0);
 	d->connected = CON_DEFAULT_CHOICE;
 	break;
-	
-case CON_GET_SECOND_CLASS:
+
+    case CON_GET_SECOND_CLASS:
+	one_argument(argument,arg);
+
+	if (!strcmp(arg,"help"))
+	{
+	    argument = one_argument(argument,arg);
+	    if (argument[0] == '\0')
+		do_help(ch,"class help");
+	    else
+		do_help(ch,argument);
+
+            write_to_buffer(d, "What class do you choose? (help for more information): ",0);
+	    break;
+  	}
+
 	iClass = class_lookup(argument);
 
 	if ( iClass == -1 )
 	{
 	    write_to_buffer( d,
-		"That's not a class.\n\rWhat IS your secondary class? ", 0 );
+		"That's not a class.\n\rWhat do you choose for your Secondary class? (help for more information): ", 0 );
 	    return;
 	}
 	if ( iClass >= ( MCLT_1 ) && ( ch->pcdata->tier != 3 ) ) {
 	    write_to_buffer( d,
-		"That's not a first tier class.\n\rWhat IS your secondary class? ", 0 );
+		"That's not a first tier class.\n\rWhat do you choose for your Secondary class? (help for more information): ", 0 );
 	    return;
 	}
 	if (iClass == (ch->class - (MCLT_1))) {
 	    write_to_buffer( d,
 		"You cannot choose the first tier equivalent of your primary class.\n\r", 0);
 	    write_to_buffer( d,
-		"What IS your secondary class? ", 0 );
+		"What do you choose for your Secondary class? (help for more information): ", 0 );
 	    return;
 	}
         ch->clasb = iClass;
 	sprintf( log_buf, "%s@%s new player.", ch->name, d->host );
 	log_string( log_buf );
-	wiznet("Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
+	wiznet("$N has joined the game for the first time.",ch,NULL,WIZ_NEWBIE,0,0);
         wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
 	write_to_buffer( d, "\n\r", 2 );
@@ -2623,11 +2666,11 @@ case CON_GET_SECOND_CLASS:
 	d->connected = CON_DEFAULT_CHOICE;
 	break;
 
-case CON_DEFAULT_CHOICE:
+    case CON_DEFAULT_CHOICE:
 	write_to_buffer(d,"\n\r",2);
         switch ( argument[0] )
         {
-        case 'y': case 'Y': 
+        case 'y': case 'Y':
 	    ch->gen_data = new_gen_data();
 	    ch->gen_data->points_chosen = ch->pcdata->points;
 	    do_help(ch,"group header");
@@ -2635,10 +2678,11 @@ case CON_DEFAULT_CHOICE:
 	    write_to_buffer(d,"You already have the following skills:\n\r",0);
 	    do_skills(ch,"");
 	    do_bskills(ch,"");
-	    do_help(ch,"menu choice");
+	    //do_help(ch,"menu choice"); // Why are we using a help entry for a prompt?!
+            send_to_char( "\n\rChoices are: list, learned, premise, add, drop, info, help, and done: ",ch);
 	    d->connected = CON_GEN_GROUPS;
 	    break;
-        case 'n': case 'N': 
+        case 'n': case 'N':
 	    group_add(ch,class_table[ch->class].default_group,TRUE);
 	    if (ch->pcdata->tier == 2)
 		group_add(ch,class_table[ch->clasb].default_group,TRUE);
@@ -2662,7 +2706,7 @@ case CON_DEFAULT_CHOICE:
         }
 	break;
 
-case CON_PICK_WEAPON:
+    case CON_PICK_WEAPON:
 	write_to_buffer(d,"\n\r",2);
 	weapon = weapon_lookup(argument);
 	if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
@@ -2687,7 +2731,7 @@ case CON_PICK_WEAPON:
 	d->connected = CON_READ_MOTD;
 	break;
 
-case CON_GEN_GROUPS:
+    case CON_GEN_GROUPS:
 	send_to_char("\n\r",ch);
        	if (!str_cmp(argument,"done"))
        	{
@@ -2701,8 +2745,7 @@ case CON_GEN_GROUPS:
 	    ch->gen_data = NULL;
 	    send_to_char(buf,ch);
             write_to_buffer( d, "\n\r", 2 );
-            write_to_buffer(d,
-                "Please pick a weapon from the following choices:\n\r",0);
+            write_to_buffer(d,"Please pick a weapon from the following choices:\n\r",0);
             buf[0] = '\0';
             for ( i = 0; weapon_table[i].name != NULL; i++)
                 if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
@@ -2717,14 +2760,12 @@ case CON_GEN_GROUPS:
         }
 
         if (!parse_gen_groups(ch,argument))
-        send_to_char(
-        "Choices are: list,learned,premise,add,drop,info,help, and done.\n\r"
-        ,ch);
+           send_to_char( "Choices are: list, learned, premise, add, drop, info, help, and done: ",ch);
 
-        do_help(ch,"menu choice");
+        //do_help(ch,"menu choice"); // Whyyyy
         break;
 
-case CON_READ_IMOTD:
+   case CON_READ_IMOTD:
 	write_to_buffer(d,"\n\r",2);
         do_help( ch, "motd" );
         d->connected = CON_READ_MOTD;
@@ -2753,7 +2794,7 @@ case CON_READ_IMOTD:
         // End of CON_GET_WIZI.
     break;
 
-case CON_READ_MOTD:
+    case CON_READ_MOTD:
         if ( ch->pcdata == NULL || ch->pcdata->pwd[0] == '\0')
         {
             write_to_buffer( d, "Warning! Null password!\n\r",0 );
@@ -2762,9 +2803,7 @@ case CON_READ_MOTD:
                 "Type 'password null <new password>' to fix.\n\r",0);
         }
 
-	write_to_buffer( d, 
-    "\n\rWelcome to RoT 2.0,  Please do not feed the twits.\n\r",
-	    0 );
+	write_to_buffer( d, "\n\rWelcome to RoT MUD 2.0!.\n\r", 0 );
 	ch->next	= char_list;
 	char_list	= ch;
 	d->connected	= CON_PLAYING;
@@ -2784,17 +2823,28 @@ case CON_READ_MOTD:
 		ch->perm_stat[class_table[ch->clasb].attr_prime] =
 	    UMIN(ch->perm_stat[class_table[ch->clasb].attr_prime] + 2.12, 25.12);
 		}
-		
 
 	    ch->level	= 1;
 	    ch->exp	= exp_per_level(ch,ch->pcdata->points);
 	    ch->hit	= ch->max_hit;
 	    ch->mana	= ch->max_mana;
 	    ch->move	= ch->max_move;
-	    if (ch->pcdata->tier == 3) { ch->train	 = 45; ch->practice = 50; }
-	    else if (ch->pcdata->tier == 2) { ch->train	 = 40; ch->practice = 45; }
-	    else if (ch->pcdata->tier == 1) { ch->train	 = 35; ch->practice = 40; }
-	    else { ch->train	 = 30; ch->practice = 35; }
+	    if (ch->pcdata->tier == 3) {
+                ch->train = 45;
+                ch->practice = 50;
+            }
+	    else if (ch->pcdata->tier == 2) {
+                ch->train = 40;
+                ch->practice = 45;
+            }
+	    else if (ch->pcdata->tier == 1) {
+                ch->train = 35;
+                ch->practice = 40;
+            }
+	    else {
+                ch->train = 30;
+                ch->practice = 35;
+            }
             ch->pcdata->camp = 3001; /* Default camp site vnum */
 	    sprintf( buf, "the %s",
 		title_table [ch->class] [ch->level]
@@ -2805,13 +2855,13 @@ case CON_READ_MOTD:
 	    obj_to_char(create_object(get_obj_index(OBJ_VNUM_MAP),0),ch);
 	    obj_to_char(create_object(get_obj_index(OBJ_VNUM_WMAP),0),ch);
 	    obj_to_char(create_object(get_obj_index(OBJ_VNUM_EMAP),0),ch);
-	    obj_to_char(create_object(get_obj_index(OBJ_VNUM_QPOUCH),0),ch);
+	    //obj_to_char(create_object(get_obj_index(OBJ_VNUM_QPOUCH),0),ch);
 	    do_pack(ch, ch->name);
 	    do_autoall(ch, "");
 	    char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
 	    send_to_char("\n\r",ch);
-	    do_help(ch,"NEWBIE INFO");
-	    send_to_char("\n\r",ch);
+	    //do_help(ch,"NEWBIE INFO");
+	    //send_to_char("\n\r",ch);
 	}
 	else if ( ch->in_room != NULL )
 	{

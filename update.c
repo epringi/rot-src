@@ -81,7 +81,7 @@ void change_level( CHAR_DATA *ch )
     if (IS_NPC(ch))
 	return;
 
-    ch->pcdata->last_level = 
+    ch->pcdata->last_level =
 	( ch->played + (int) (current_time - ch->logon) ) / 3600;
 
     sprintf( buf, "the %s",
@@ -153,12 +153,12 @@ void change_level( CHAR_DATA *ch )
    if (ch->hit > ch->max_hit) { ch->hit = ch->max_hit; }
    if (ch->mana > ch->max_mana) { ch->mana = ch->max_mana; }
    if (ch->move > ch->max_move) { ch->move = ch->max_move; }
-   	affect_strip        (ch,gsn_plague);    
-	affect_strip        (ch,gsn_poison);    
-	affect_strip        (ch,gsn_blindness);    
-	affect_strip        (ch,gsn_sleep);    
-	affect_strip        (ch,gsn_curse);   
- 
+   	affect_strip        (ch,gsn_plague);
+	affect_strip        (ch,gsn_poison);
+	affect_strip        (ch,gsn_blindness);
+	affect_strip        (ch,gsn_sleep);
+	affect_strip        (ch,gsn_curse);
+
     for (loc = 0; loc < MAX_WEAR; loc++)
     {
 	obj = get_eq_char(ch,loc);
@@ -177,6 +177,9 @@ void change_level( CHAR_DATA *ch )
     {
 	ch->newbie = 0;
 	send_to_char("{RYou now have full channel permissions.{x\n\r",ch);
+        if (ch->in_room->area->vnum==AREA_VNUM_SCHOOL){
+            send_to_char("You have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.", ch);
+        }
     }
     if (IS_IMMORTAL(ch) && ch->clock)
 	ch->clock = 0;
@@ -191,7 +194,7 @@ void change_level( CHAR_DATA *ch )
     if (IS_HERO(ch))
 	ch->pcdata->advanced = 0;
     return;
-}   
+}
 
 void change_level_quiet( CHAR_DATA *ch )
 {

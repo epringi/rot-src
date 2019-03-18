@@ -418,7 +418,7 @@ void do_advance( CHAR_DATA *ch, char *argument)
    }
 
    if ( check_char_exist( arg ) ) {
-	send_to_char( "That name is already in use, or is illegal.\n\r", ch );
+	send_to_char( "That name is already in use, or is disallowed.\n\r", ch );
 	return;
    }
 
@@ -2592,38 +2592,43 @@ void do_quit( CHAR_DATA *ch, char *argument )
     log_string( log_buf );
     wiznet("$N rejoins the real world.",ch,NULL,WIZ_LOGINS,0,get_trust(ch));
  */
-        switch (number_range(1,3)) {
-                        case 1:
-send_to_char( "{r			You think you must be dreaming.{x\n\r",ch);
-send_to_char( "{c		     You finally manage to wake yourself.{x\n\r",ch);
-send_to_char( "{B	  What a strange dream, you close your eyes and go back to sleep.{x\n\r",ch); break;
-                        case 2:
-send_to_char( "\n\r                         Speak not: whisper not:\n\r",ch);
-send_to_char( "                      I know all that ye would tell,\n\r",ch);
-send_to_char( "                    But to speak might break the spell\n\r",ch);
-send_to_char( "                      Which must bend the invincible,\n\r",ch);
-send_to_char( "                          The stern of thought;\n\r",ch);
-send_to_char( "                   Yet defies the deepest power of Hell.\n\r\n\r",ch ); break;
-                        case 3: send_to_char( "{hReality arrives from somewhere.{x\n\r",ch);
-   switch( number_range(1,3) ) {
-case 1:
-    send_to_char( "{hYou really hit Reality hard!{x\n\r",ch);
-    send_to_char( "{hReality turns your attack against you!{x\n\r",ch); break;
-case 2:
-    send_to_char( "{hYour attack misses Reality!!{x\n\r",ch);
-        send_to_char( "{hReality Rips into your fantasy!!{x\n\r",ch); break;
-case 3:
-    send_to_char( "{hReality's backstab {z{W@@@@@@@{x {z{Y*{xM{z{Y*{xe{z{Y*{xG{z{Y*{xa{z{Y*{xN{z{Y*{xu{z{Y*{xK{z{Y*{xe{z{Y*{x{rs{z{R*{x{W @@@@@@@ You!{x\n\r",ch);break;
-        }
-   switch( number_range(1,5) ) {
-case 1: send_to_char( "{iReality's truth *** DEVASTATES *** you!{x\n\r\n\r",ch); break;
-case 2: send_to_char( "{iReality's truth === OBLITERATES === you!{x\n\r\n\r",ch); break;
-case 3: send_to_char( "{iReality's truth >>> ANNIHILATES <<< you!{x\n\r\n\r",ch); break;
-case 4: send_to_char( "{iReality's truth <<< ERADICATES >>> you!{x\n\r\n\r",ch); break;
-case 5: send_to_char( "{iReality's truth does UNSPEAKABLE things to you!{x\n\r\n\r",ch); break;
-        }
-        send_to_char( "{cYou have been {RKILLED!! (just kidding){x\n\r\n\r", ch );
-        }
+    switch (number_range(1,3)) {
+       case 1:
+          send_to_char( "{r			You think you must be dreaming.{x\n\r",ch);
+          send_to_char( "{c		     You finally manage to wake yourself.{x\n\r",ch);
+          send_to_char( "{B	  What a strange dream, you close your eyes and go back to sleep.{x\n\r",ch); break;
+       case 2:
+          send_to_char( "\n\r                         Speak not: whisper not:\n\r",ch);
+          send_to_char( "                      I know all that ye would tell,\n\r",ch);
+          send_to_char( "                    But to speak might break the spell\n\r",ch);
+          send_to_char( "                      Which must bend the invincible,\n\r",ch);
+          send_to_char( "                          The stern of thought;\n\r",ch);
+          send_to_char( "                   Yet defies the deepest power of Hell.\n\r\n\r",ch ); break;
+       case 3:
+          send_to_char( "{hReality arrives from somewhere.{x\n\r",ch);
+          switch( number_range(1,3) ) {
+             case 1:
+                //send_to_char( "{hYou really hit Reality hard!{x\n\r",ch);
+                //send_to_char( "{hReality turns your attack against you!{x\n\r",ch); break;
+                send_to_char( "{hUntil next time, friend!{x\n\r",ch); break;
+             case 2:
+                //send_to_char( "{hYour attack misses Reality!!{x\n\r",ch);
+                //send_to_char( "{hReality Rips into your fantasy!!{x\n\r",ch); break;
+                send_to_char( "{hYou leave fantasy behind...{x\n\r",ch); break;
+             case 3:
+                //send_to_char( "{hReality's backstab {z{W@@@@@@@{x {z{Y*{xM{z{Y*{xe{z{Y*{xG{z{Y*{xa{z{Y*{xN{z{Y*{xu{z{Y*{xK{z{Y*{xe{z{Y*{x{rs{z{R*{x{W @@@@@@@ You!{x\n\r",ch);break;
+                send_to_char( "{hYour head becomes clearer.{x\n\r",ch); break;
+          }
+          switch( number_range(1,5) ) {
+             case 1: //send_to_char( "{iReality's truth *** DEVASTATES *** you!{x\n\r\n\r",ch); break;
+             case 2: //send_to_char( "{iReality's truth === OBLITERATES === you!{x\n\r\n\r",ch); break;
+             case 3: //send_to_char( "{iReality's truth >>> ANNIHILATES <<< you!{x\n\r\n\r",ch); break;
+             case 4: //send_to_char( "{iReality's truth <<< ERADICATES >>> you!{x\n\r\n\r",ch); break;
+             case 5: //send_to_char( "{iReality's truth does UNSPEAKABLE things to you!{x\n\r\n\r",ch); break;
+               send_to_char( "{iIt trips over your vast imagination.{x\n\r\n\r",ch); break;
+          }
+       //send_to_char( "{cYou have been {RKILLED!! (just kidding){x\n\r\n\r", ch );
+    }
     WAIT_STATE(ch,15 * PULSE_VIOLENCE);
     act( "$n has left the game.", ch, NULL, NULL, TO_ROOM );
     sprintf( log_buf, "%s has quit.", ch->name );

@@ -1457,14 +1457,14 @@ void do_look( CHAR_DATA *ch, char *argument )
     if ( arg1[0] == '\0' || !str_cmp( arg1, "auto" ) )
     {
 	/* 'look' or 'look auto' */
-	send_to_char( "{D-{w={W[{m ", ch);
+	send_to_char( "{D-{w={W[{w ", ch);
 	send_to_char( ch->in_room->name, ch );
 	send_to_char( " {W]{w={D-{x", ch);
 
 	if ( (IS_IMMORTAL(ch) && (IS_NPC(ch) || IS_SET(ch->act,PLR_HOLYLIGHT)))
 	||   IS_BUILDER(ch, ch->in_room->area) )
 	{
-	    sprintf(buf," {D-{w={W[ {WR{Doom {m%d {W]{w={D-{x",ch->in_room->vnum);
+	    sprintf(buf," {D[ {w%d {D]{x",ch->in_room->vnum);
 	    send_to_char(buf,ch);
 	}
 
@@ -2029,7 +2029,7 @@ void do_exits (CHAR_DATA * ch, char *argument)
         return;
 
     if (fAuto)
-        sprintf (buf, "{W[{mExits{W:");
+        sprintf (buf, "{W[{wExits{W:{x");
     else if (IS_IMMORTAL (ch))
         sprintf (buf, "Obvious exits from room %d:\n\r", ch->in_room->vnum);
     else
@@ -2732,6 +2732,7 @@ void do_help( CHAR_DATA *ch, char *argument )
 		send_to_char( pHelp->keyword, ch );
 		send_to_char( "\n\r", ch );
 	    }
+            send_to_char("\n\r", ch); // added to deal with clumping text
 
 	    /*
 	     * Strip leading '.' to allow initial blanks.
@@ -2743,6 +2744,7 @@ void do_help( CHAR_DATA *ch, char *argument )
 	    {
 		page_to_char( pHelp->text  , ch );
 	    }
+            send_to_char("\n\r", ch); // added to deal with clumping text
 	    return;
 	}
     }

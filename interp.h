@@ -71,6 +71,7 @@ extern	const	struct	cmd_type	cmd_table	[];
  * Command functions.
  * Defined in act_*.c (mostly).
  */
+DECLARE_DO_FUN(	do_codetest		);
 DECLARE_DO_FUN(	do_accept	);
 DECLARE_DO_FUN(	do_advance	);
 DECLARE_DO_FUN( do_aedit	);
