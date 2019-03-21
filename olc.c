@@ -443,7 +443,7 @@ void aedit( CHAR_DATA *ch, char *argument )
     strcpy( arg, argument );
     argument = one_argument( argument, command );
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
     {
 	send_to_char( "AEdit:  Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -508,9 +508,9 @@ void redit( CHAR_DATA *ch, char *argument )
     strcpy( arg, argument );
     argument = one_argument( argument, command );
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR)
     {
-        send_to_char( "REdit:  Insufficient security to modify room.\n\r", ch );
+        send_to_char( "REdit: Insufficient security to modify room.\n\r", ch );
 	edit_done( ch );
 	return;
     }
@@ -565,7 +565,7 @@ void oedit( CHAR_DATA *ch, char *argument )
     EDIT_OBJ(ch, pObj);
     pArea = pObj->area;
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
     {
 	send_to_char( "OEdit: Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -622,7 +622,7 @@ void medit( CHAR_DATA *ch, char *argument )
     EDIT_MOB(ch, pMob);
     pArea = pMob->area;
 
-    if ( !IS_BUILDER( ch, pArea) )
+    if ( !IS_BUILDER( ch, pArea) && !IMPLEMENTOR )
     {
 	send_to_char( "MEdit: Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -672,7 +672,7 @@ void hedit( CHAR_DATA *ch, char *argument)
     strcpy(arg, argument);
     argument = one_argument( argument, command);
 
-    if (ch->pcdata->security < 9)
+    if (ch->pcdata->security < 9 && !IMPLEMENTOR)
     {
         send_to_char("HEdit: Insufficient security to modify code\n\r",ch);
        edit_done(ch);
@@ -867,9 +867,9 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	char_to_room( ch, pRoom );
     }
 
-    if ( !IS_BUILDER(ch, pRoom->area) )
+    if ( !IS_BUILDER(ch, pRoom->area) && !IMPLEMENTOR )
     {
-    	send_to_char( "REdit : Insuficiente seguridad para editar cuartos.\n\r", ch );
+    	send_to_char( "REdit: Insufficient security to modify room.\n\r", ch );
     	return;
     }
 

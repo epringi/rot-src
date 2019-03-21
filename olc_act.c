@@ -5245,7 +5245,7 @@ REDIT( redit_room )
 	if ( (value = flag_value( room_flags, argument )) == NO_FLAG )
 	{
 		send_to_char( "Syntax: room [flags]\n\r", ch );
-                send_to_char( "\n\rFlags:\n\r, ch );
+                send_to_char( "\n\rFlags:\n\r", ch );
                 send_to_char( "    dark           no_mobs\n\r", ch );
                 send_to_char( "    indoors        private\n\r", ch );
                 send_to_char( "    safe           solitary\n\r", ch );
