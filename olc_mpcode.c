@@ -135,7 +135,7 @@ void do_mpedit(CHAR_DATA *ch, char *argument)
     {
 	if (argument[0] == '\0')
 	{
-		send_to_char( "Sintaxis : mpedit create [vnum]\n\r", ch );
+		send_to_char( "Syntax : mpedit create [vnum]\n\r", ch );
 		return;
 	}
 
@@ -143,7 +143,7 @@ void do_mpedit(CHAR_DATA *ch, char *argument)
 	return;
     }
 
-    send_to_char( "Sintaxis : mpedit [vnum]\n\r", ch );
+    send_to_char( "Syntax : mpedit [vnum]\n\r", ch );
     send_to_char( "           mpedit create [vnum]\n\r", ch );
 
     return;
@@ -157,7 +157,7 @@ MPEDIT (mpedit_create)
 
     if (IS_NULLSTR(argument) || value < 1)
     {
-	send_to_char( "Sintaxis : mpedit create [vnum]\n\r", ch );
+	send_to_char( "Syntax : mpedit create [vnum]\n\r", ch );
 	return FALSE;
     }
 

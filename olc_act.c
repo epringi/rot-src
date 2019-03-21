@@ -5244,7 +5244,17 @@ REDIT( redit_room )
 
 	if ( (value = flag_value( room_flags, argument )) == NO_FLAG )
 	{
-		send_to_char( "Sintaxis: room [flags]\n\r", ch );
+		send_to_char( "Syntax: room [flags]\n\r", ch );
+                send_to_char( "\n\rFlags:\n\r, ch );
+                send_to_char( "    dark           no_mobs\n\r", ch );
+                send_to_char( "    indoors        private\n\r", ch );
+                send_to_char( "    safe           solitary\n\r", ch );
+                send_to_char( "    pet_shop       no_recall\n\r", ch );
+                send_to_char( "    imp_only       gods_only\n\r", ch );
+                send_to_char( "    heroes_only    newbies_only\n\r", ch );
+                send_to_char( "    law            nowhere\n\r", ch );
+                send_to_char( "    clan_ent       arena\n\r", ch );
+                send_to_char( "    locked\n\r", ch );
 		return FALSE;
 	}
 
@@ -5262,7 +5272,7 @@ REDIT( redit_sector )
 
 	if ( (value = flag_value( sector_flags, argument )) == NO_FLAG )
 	{
-		send_to_char( "Sintaxis: sector [tipo]\n\r", ch );
+		send_to_char( "Syntax: sector [tipo]\n\r", ch );
 		return FALSE;
 	}
 

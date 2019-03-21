@@ -1468,7 +1468,7 @@ void do_look( CHAR_DATA *ch, char *argument )
     if ( arg1[0] == '\0' || !str_cmp( arg1, "auto" ) )
     {
 	/* 'look' or 'look auto' */
-	send_to_char( "{D-{w={W[{w ", ch);
+	send_to_char( "\n\r{D-{w={W[{w ", ch);
 	send_to_char( ch->in_room->name, ch );
 	send_to_char( " {W]{w={D-{x", ch);
 
