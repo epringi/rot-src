@@ -179,11 +179,7 @@ char stuff[10];
 	ch->newbie = 0;
 	send_to_char("{RYou now have full channel permissions.{x\n\r",ch);
         if (ch->in_room->area->vnum==AREA_VNUM_SCHOOL){
-            send_to_char("You have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.", ch);
-        }
-        else{
-           sprintf(stuff, "%d - %d\n\r", ch->in_room->area->vnum, AREA_VNUM_SCHOOL);
-           send_to_char(stuff, ch);
+            send_to_char("{YYou have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.{x\n\r", ch);
         }
     }
     if (IS_IMMORTAL(ch) && ch->clock)
@@ -292,11 +288,7 @@ char stuff[10];
 	ch->newbie = 0;
 	send_to_char("{RYou now have full channel permissions.{x\n\r",ch);
         if (ch->in_room->area->vnum==AREA_VNUM_SCHOOL){
-            send_to_char("You have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.", ch);
-        }
-        else{
-           sprintf(stuff, "%d - %d\n\r", ch->in_room->area->vnum, AREA_VNUM_SCHOOL);
-           send_to_char(stuff, ch);
+            send_to_char("{YYou have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.{x\n\r", ch);
         }
     }
     if (IS_IMMORTAL(ch) && ch->clock)

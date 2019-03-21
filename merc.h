@@ -1439,7 +1439,7 @@ struct	kill_data
  * Multiple use area virtual numbers.
  * Found in ch->in_room->area->vnum.
  */
-#define AREA_VNUM_SCHOOL	      3
+#define AREA_VNUM_SCHOOL	      41
 
 
 

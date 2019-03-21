@@ -1645,6 +1645,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
     bool found;
     const char *dir_name[] = {"n","e","s","w","u","d"};
     int door;
+    int exits;
 
     ch=d->character;
 
@@ -1680,7 +1681,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
             case 'e':
                 found = FALSE;
                 doors[0] = '\0';
-                for (door = 0, found = 0; door < 6; door++)
+                for (door = 0, exits = 0; door < 6; door++)
                 {
                     if ((pexit = ch->in_room->exit[door]) != NULL
                         && pexit->u1.to_room != NULL
@@ -1690,8 +1691,8 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
                         && !IS_SET (pexit->exit_info, EX_CLOSED))
                     {
                         found = TRUE;
-                        found ++;
-                        if(found >= 1){
+                        exits ++;
+                        if(exits >= 2){
                             strcat (doors, ",");
                         }
                         strcat (doors, dir_name[door]);
@@ -3592,7 +3593,7 @@ void show_string(struct descriptor_data *d, char *input)
         	    }
         	    d->showstr_point  = 0;
     		}
-	    }
+            }
 	    return;
 	}
     }
