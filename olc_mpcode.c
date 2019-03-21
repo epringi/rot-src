@@ -57,7 +57,7 @@ void mpedit( CHAR_DATA *ch, char *argument)
 		return;
 	}
 
-	if ( !IS_BUILDER(ch, ad) )
+	if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
 	{
 		send_to_char("MPEdit: Insufficient security to modify code.\n\r", ch);
 		edit_done(ch);
@@ -119,9 +119,9 @@ void do_mpedit(CHAR_DATA *ch, char *argument)
 		return;
 	}
 
-	if ( !IS_BUILDER(ch, ad) )
+	if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
 	{
-		send_to_char("MPEdit : Insuficiente seguridad para editar area.\n\r", ch );
+		send_to_char("MPEdit : Insufficient security to modify area.\n\r", ch );
 		return;
 	}
 
@@ -168,10 +168,10 @@ MPEDIT (mpedit_create)
     	send_to_char( "MPEdit : VNUM no asignado a ningun area.\n\r", ch );
     	return FALSE;
     }
-    
-    if ( !IS_BUILDER(ch, ad) )
+
+    if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
     {
-        send_to_char("MPEdit : Insuficiente seguridad para crear MobProgs.\n\r", ch);
+        send_to_char("MPEdit : Insufficient security to modify MobProgs.\n\r", ch);
         return FALSE;
     }
 

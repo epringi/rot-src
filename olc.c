@@ -789,9 +789,9 @@ void do_aedit( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (!IS_BUILDER(ch,pArea))
+    if (!IS_BUILDER(ch,pArea) && !IMPLEMENTOR)
     {
-	send_to_char("Insuficiente seguridad para editar areas.\n\r",ch);
+	send_to_char("Insufficient security to modify area.\n\r",ch);
 	return;
     }
 
@@ -817,9 +817,9 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg1, "reset" ) )	/* redit reset */
     {
-	if ( !IS_BUILDER( ch, pRoom->area ) )
+	if ( !IS_BUILDER( ch, pRoom->area ) && !IMPLEMENTOR )
 	{
-		send_to_char( "Insuficiente seguridad para modificar cuartos.\n\r" , ch );
+		send_to_char( "Insufficient security to modify room.\n\r" , ch );
         	return;
 	}
 
@@ -903,9 +903,9 @@ void do_oedit( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( !IS_BUILDER( ch, pObj->area ) )
+	if ( !IS_BUILDER( ch, pObj->area ) && !IMPLEMENTOR )
 	{
-		send_to_char( "Insuficiente seguridad para modificar objetos.\n\r" , ch );
+		send_to_char( "Insufficient security to modify object.\n\r" , ch );
 	        return;
 	}
 
@@ -932,9 +932,9 @@ void do_oedit( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    if ( !IS_BUILDER( ch, pArea ) )
+	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
 	    {
-		send_to_char( "Insuficiente seguridad para modificar objetos.\n\r" , ch );
+		send_to_char( "Insufficient security to modify object.\n\r" , ch );
 	        return;
 	    }
 
@@ -975,9 +975,9 @@ void do_medit( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( !IS_BUILDER( ch, pMob->area ) )
+	if ( !IS_BUILDER( ch, pMob->area ) && !IMPLEMENTOR )
 	{
-		send_to_char( "Insuficiente seguridad para modificar mobs.\n\r" , ch );
+		send_to_char( "Insufficient security to modify mobs.\n\r" , ch );
 	        return;
 	}
 
@@ -1004,9 +1004,9 @@ void do_medit( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    if ( !IS_BUILDER( ch, pArea ) )
+	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
 	    {
-		send_to_char( "Insuficiente seguridad para modificar mobs.\n\r" , ch );
+		send_to_char( "Insufficient security to modify mobs.\n\r" , ch );
 	        return;
 	    }
 
