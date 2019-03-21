@@ -1349,7 +1349,7 @@ bool change_exit( CHAR_DATA *ch, char *argument, int door )
 	    return FALSE;
 	}
 
-	if ( !IS_BUILDER( ch, get_room_index( value )->area ) )
+	if ( !IS_BUILDER( ch, get_room_index( value )->area ) && !IS_IMPLEMENTOR(ch) )
 	{
 	    send_to_char( "REdit:  Cannot link to that area.\n\r", ch );
 	    return FALSE;
@@ -1368,7 +1368,7 @@ bool change_exit( CHAR_DATA *ch, char *argument, int door )
 
 	pRoom->exit[door]->u1.to_room = get_room_index( value );   /* ROM OLC */
 	pRoom->exit[door]->orig_door = door;
-	
+
 /*	pRoom->exit[door]->vnum = value;                Can't set vnum in ROM */
 
 	pRoom                   = get_room_index( value );
@@ -1382,17 +1382,17 @@ bool change_exit( CHAR_DATA *ch, char *argument, int door )
 	send_to_char( "Two-way link established.\n\r", ch );
 	return TRUE;
     }
-        
+
     if ( !str_cmp( command, "dig" ) )
     {
 	char buf[MAX_STRING_LENGTH];
-	
+
 	if ( arg[0] == '\0' || !is_number( arg ) )
 	{
 	    send_to_char( "Syntax: [direction] dig <vnum>\n\r", ch );
 	    return FALSE;
 	}
-	
+
 	redit_create( ch, arg );
 	sprintf( buf, "link %s", arg );
 	change_exit( ch, buf, door);
@@ -1725,7 +1725,7 @@ REDIT( redit_create )
     ROOM_INDEX_DATA *pRoom;
     int value;
     int iHash;
-    
+
     EDIT_ROOM(ch, pRoom);
 
     value = atoi( argument );
@@ -1743,7 +1743,7 @@ REDIT( redit_create )
 	return FALSE;
     }
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "REdit:  Vnum in an area you cannot build in.\n\r", ch );
 	return FALSE;
@@ -3185,7 +3185,7 @@ OEDIT( oedit_create )
 	return FALSE;
     }
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "OEdit:  Vnum in an area you cannot build in.\n\r", ch );
 	return FALSE;
@@ -3196,11 +3196,11 @@ OEDIT( oedit_create )
 	send_to_char( "OEdit:  Object vnum already exists.\n\r", ch );
 	return FALSE;
     }
-        
+
     pObj			= new_obj_index();
     pObj->vnum			= value;
     pObj->area			= pArea;
-        
+
     if ( value > top_vnum_obj )
 	top_vnum_obj = value;
 
@@ -3834,7 +3834,7 @@ MEDIT( medit_create )
 	return FALSE;
     }
 
-    if ( !IS_BUILDER( ch, pArea ) )
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "MEdit:  Vnum in an area you cannot build in.\n\r", ch );
 	return FALSE;
@@ -3849,9 +3849,9 @@ MEDIT( medit_create )
     pMob			= new_mob_index();
     pMob->vnum			= value;
     pMob->area			= pArea;
-        
+
     if ( value > top_vnum_mob )
-	top_vnum_mob = value;        
+	top_vnum_mob = value;
 
     pMob->act			= ACT_IS_NPC;
     iHash			= value % MAX_KEY_HASH;

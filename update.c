@@ -77,6 +77,7 @@ void change_level( CHAR_DATA *ch )
     int add_move;
     int add_prac;
     OBJ_DATA *obj;
+char stuff[10];
 
     if (IS_NPC(ch))
 	return;
@@ -180,6 +181,10 @@ void change_level( CHAR_DATA *ch )
         if (ch->in_room->area->vnum==AREA_VNUM_SCHOOL){
             send_to_char("You have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.", ch);
         }
+        else{
+           sprintf(stuff, "%d - %d\n\r", ch->in_room->area->vnum, AREA_VNUM_SCHOOL);
+           send_to_char(stuff, ch);
+        }
     }
     if (IS_IMMORTAL(ch) && ch->clock)
 	ch->clock = 0;
@@ -205,11 +210,12 @@ void change_level_quiet( CHAR_DATA *ch )
     int add_move;
     int add_prac;
     OBJ_DATA *obj;
+char stuff[10];
 
     if (IS_NPC(ch))
 	return;
 
-    ch->pcdata->last_level = 
+    ch->pcdata->last_level =
 	( ch->played + (int) (current_time - ch->logon) ) / 3600;
 
     sprintf( buf, "the %s",
@@ -223,7 +229,7 @@ void change_level_quiet( CHAR_DATA *ch )
 
     if (ch->pcdata->tier != 2)
     {
-	add_hp	= con_app[get_curr_stat(ch,STAT_CON)].hitp + 
+	add_hp	= con_app[get_curr_stat(ch,STAT_CON)].hitp +
 		    number_range(class_table[ch->class].hp_min,
 				 class_table[ch->class].hp_max );
 	add_mana = number_range(4,(4*get_curr_stat(ch,STAT_INT)
@@ -285,21 +291,28 @@ void change_level_quiet( CHAR_DATA *ch )
     {
 	ch->newbie = 0;
 	send_to_char("{RYou now have full channel permissions.{x\n\r",ch);
+        if (ch->in_room->area->vnum==AREA_VNUM_SCHOOL){
+            send_to_char("You have graduated from School!  The doors are now locked, so when you're ready, type 'recall' to leave.", ch);
+        }
+        else{
+           sprintf(stuff, "%d - %d\n\r", ch->in_room->area->vnum, AREA_VNUM_SCHOOL);
+           send_to_char(stuff, ch);
+        }
     }
-    if (IS_IMMORTAL(ch) && ch->clock) 
+    if (IS_IMMORTAL(ch) && ch->clock)
         ch->clock = 0;
-    if (ch->clock) 
-    { 
-        if (ch->clock <= ch->level) 
-        { 
-            ch->clock = 0; 
-            send_to_char("{RYou are now authorized to change your clan status again.{x\n\r",ch); 
-        } 
-    } 
+    if (ch->clock)
+    {
+        if (ch->clock <= ch->level)
+        {
+            ch->clock = 0;
+            send_to_char("{RYou are now authorized to change your clan status again.{x\n\r",ch);
+        }
+    }
     if (IS_HERO(ch))
 	ch->pcdata->advanced = 0;
     return;
-}   
+}
 
 void gain_exp( CHAR_DATA *ch, int gain )
 {

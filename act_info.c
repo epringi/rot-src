@@ -1473,7 +1473,7 @@ void do_look( CHAR_DATA *ch, char *argument )
 	send_to_char( " {W]{w={D-{x", ch);
 
 	if ( (IS_IMMORTAL(ch) && (IS_NPC(ch) || IS_SET(ch->act,PLR_HOLYLIGHT)))
-	||   IS_BUILDER(ch, ch->in_room->area) )
+	||   IS_BUILDER(ch, ch->in_room->area) || IS_IMPLEMENTOR(ch) )
 	{
 	    sprintf(buf," {D[ {w%d {D]{x",ch->in_room->vnum);
 	    send_to_char(buf,ch);

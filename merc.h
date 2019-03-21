@@ -2756,7 +2756,7 @@ extern sh_int  gsn_tail;
                                  ( ch->pcdata->security >= Area->security  \
                                  || strstr( Area->builders, ch->name )     \
                                  || strstr( Area->builders, "All" ) ) )
-  
+#define IS_IMPLEMENTOR(ch)      (ch->level == MAX_LEVEL)
 
 /*
  * Object macros.

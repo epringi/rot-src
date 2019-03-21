@@ -366,7 +366,7 @@ void do_gquest( CHAR_DATA *ch, char *argument )
 	    send_to_char( "They aren't here.\n\r", ch );
 	    return;
 	}
-	if (!IS_NPC(victim))
+	if (!IS_NPC(victim) && !IMPLEMENTOR)
 	{
 	    send_to_char( "Not on PC's.\n\r", ch );
 	    return;
@@ -5074,7 +5074,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 
     if ( !str_prefix( arg2, "level" ) )
     {
-	if ( !IS_NPC(victim) )
+	if ( !IS_NPC(victim) && !IMPLEMENTOR )
 	{
 	    send_to_char( "Not on PC's.\n\r", ch );
 	    return;
@@ -5516,7 +5516,7 @@ void do_string( CHAR_DATA *ch, char *argument )
 
      	if ( !str_prefix( arg2, "name" ) )
     	{
-	    if ( !IS_NPC(victim) )
+	    if ( !IS_NPC(victim) && !IMPLEMENTOR )
 	    {
 	    	send_to_char( "Not on PC's.\n\r", ch );
 	    	return;
@@ -5562,7 +5562,7 @@ void do_string( CHAR_DATA *ch, char *argument )
 
     	if ( !str_prefix( arg2, "spec" ) )
     	{
-	    if ( !IS_NPC(victim) )
+	    if ( !IS_NPC(victim) && !IMPLEMENTOR )
 	    {
 	    	send_to_char( "Not on PC's.\n\r", ch );
 	    	return;

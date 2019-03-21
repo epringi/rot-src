@@ -993,7 +993,7 @@ void do_asave( CHAR_DATA *ch, char *argument )
 
     if ( is_number( arg1 ) )
     {
-	if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 	{
 	    send_to_char( "You are not a builder for this area.\n\r", ch );
 	    return;
@@ -1011,7 +1011,7 @@ void do_asave( CHAR_DATA *ch, char *argument )
 	for( pArea = area_first; pArea; pArea = pArea->next )
 	{
 	    /* Builder must be assigned this area. */
-	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 		continue;
 
 	    save_area( pArea );
@@ -1037,7 +1037,7 @@ void do_asave( CHAR_DATA *ch, char *argument )
 	for( pArea = area_first; pArea; pArea = pArea->next )
 	{
 	    /* Builder must be assigned this area. */
-	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 		continue;
 
 	    /* Save changed areas. */
@@ -1094,7 +1094,7 @@ void do_asave( CHAR_DATA *ch, char *argument )
 		break;
 	}
 
-	if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 	{
 	    send_to_char( "You are not a builder for this area.\n\r", ch );
 	    return;

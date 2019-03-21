@@ -443,7 +443,7 @@ void aedit( CHAR_DATA *ch, char *argument )
     strcpy( arg, argument );
     argument = one_argument( argument, command );
 
-    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "AEdit:  Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -508,7 +508,7 @@ void redit( CHAR_DATA *ch, char *argument )
     strcpy( arg, argument );
     argument = one_argument( argument, command );
 
-    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR)
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
         send_to_char( "REdit: Insufficient security to modify room.\n\r", ch );
 	edit_done( ch );
@@ -565,7 +565,7 @@ void oedit( CHAR_DATA *ch, char *argument )
     EDIT_OBJ(ch, pObj);
     pArea = pObj->area;
 
-    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "OEdit: Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -622,7 +622,7 @@ void medit( CHAR_DATA *ch, char *argument )
     EDIT_MOB(ch, pMob);
     pArea = pMob->area;
 
-    if ( !IS_BUILDER( ch, pArea) && !IMPLEMENTOR )
+    if ( !IS_BUILDER( ch, pArea) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "MEdit: Insufficient security to modify area.\n\r", ch );
 	edit_done( ch );
@@ -789,7 +789,7 @@ void do_aedit( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (!IS_BUILDER(ch,pArea) && !IMPLEMENTOR)
+    if (!IS_BUILDER(ch,pArea) && !IS_IMPLEMENTOR(ch))
     {
 	send_to_char("Insufficient security to modify area.\n\r",ch);
 	return;
@@ -817,7 +817,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg1, "reset" ) )	/* redit reset */
     {
-	if ( !IS_BUILDER( ch, pRoom->area ) && !IMPLEMENTOR )
+	if ( !IS_BUILDER( ch, pRoom->area ) && !IS_IMPLEMENTOR(ch) )
 	{
 		send_to_char( "Insufficient security to modify room.\n\r" , ch );
         	return;
@@ -853,13 +853,13 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
 	if ( !pRoom )
 	{
-		send_to_char( "REdit : cuarto inexistente.\n\r", ch );
+		send_to_char( "REdit : Room does not exist.\n\r", ch );
 		return;
 	}
 
-	if ( !IS_BUILDER(ch, pRoom->area) )
+	if ( !IS_BUILDER(ch, pRoom->area) && !IS_IMPLEMENTOR(ch) )
 	{
-		send_to_char( "REdit : insuficiente seguridad para editar cuarto.\n\r", ch );
+		send_to_char( "REdit : Insufficient security to modify room.\n\r", ch );
 		return;
 	}
 
@@ -867,7 +867,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	char_to_room( ch, pRoom );
     }
 
-    if ( !IS_BUILDER(ch, pRoom->area) && !IMPLEMENTOR )
+    if ( !IS_BUILDER(ch, pRoom->area) && !IS_IMPLEMENTOR(ch) )
     {
     	send_to_char( "REdit: Insufficient security to modify room.\n\r", ch );
     	return;
@@ -903,7 +903,7 @@ void do_oedit( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( !IS_BUILDER( ch, pObj->area ) && !IMPLEMENTOR )
+	if ( !IS_BUILDER( ch, pObj->area ) && !IS_IMPLEMENTOR(ch) )
 	{
 		send_to_char( "Insufficient security to modify object.\n\r" , ch );
 	        return;
@@ -932,7 +932,7 @@ void do_oedit( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 	    {
 		send_to_char( "Insufficient security to modify object.\n\r" , ch );
 	        return;
@@ -975,7 +975,7 @@ void do_medit( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( !IS_BUILDER( ch, pMob->area ) && !IMPLEMENTOR )
+	if ( !IS_BUILDER( ch, pMob->area ) && !IS_IMPLEMENTOR(ch) )
 	{
 		send_to_char( "Insufficient security to modify mobs.\n\r" , ch );
 	        return;
@@ -1004,7 +1004,7 @@ void do_medit( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    if ( !IS_BUILDER( ch, pArea ) && !IMPLEMENTOR )
+	    if ( !IS_BUILDER( ch, pArea ) && !IS_IMPLEMENTOR(ch) )
 	    {
 		send_to_char( "Insufficient security to modify mobs.\n\r" , ch );
 	        return;
@@ -1354,7 +1354,7 @@ void do_resets( CHAR_DATA *ch, char *argument )
     argument = one_argument( argument, arg6 );
     argument = one_argument( argument, arg7 );
 
-    if ( !IS_BUILDER( ch, ch->in_room->area ) )
+    if ( !IS_BUILDER( ch, ch->in_room->area ) && !IS_IMPLEMENTOR(ch) )
     {
 	send_to_char( "Resets: Invalid security for editing this area.\n\r",
                       ch );

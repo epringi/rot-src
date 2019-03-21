@@ -57,7 +57,7 @@ void mpedit( CHAR_DATA *ch, char *argument)
 		return;
 	}
 
-	if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
+	if ( !IS_BUILDER(ch, ad) && !IS_IMPLEMENTOR(ch) )
 	{
 		send_to_char("MPEdit: Insufficient security to modify code.\n\r", ch);
 		edit_done(ch);
@@ -119,7 +119,7 @@ void do_mpedit(CHAR_DATA *ch, char *argument)
 		return;
 	}
 
-	if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
+	if ( !IS_BUILDER(ch, ad) && !IS_IMPLEMENTOR(ch) )
 	{
 		send_to_char("MPEdit : Insufficient security to modify area.\n\r", ch );
 		return;
@@ -169,7 +169,7 @@ MPEDIT (mpedit_create)
     	return FALSE;
     }
 
-    if ( !IS_BUILDER(ch, ad) && !IMPLEMENTOR )
+    if ( !IS_BUILDER(ch, ad) && !IS_IMPLEMENTOR(ch) )
     {
         send_to_char("MPEdit : Insufficient security to modify MobProgs.\n\r", ch);
         return FALSE;
@@ -244,7 +244,7 @@ MPEDIT( mpedit_list )
 		if ( ad == NULL )
 			blah = '?';
 		else
-		if ( IS_BUILDER(ch, ad) )
+		if ( IS_BUILDER(ch, ad) || IS_IMPLEMENTOR(ch) )
 			blah = '*';
 		else
 			blah = ' ';
