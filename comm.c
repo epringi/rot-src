@@ -2108,7 +2108,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    write_to_buffer( d, buf, 0 );
 	    sprintf( buf, "https://www.fantasynamegenerators.com/dungeons-and-dragons.php can help.\n\r");
 	    write_to_buffer( d, buf, 0 );
-	    sprintf( buf, "Are you satisfied with the name %s? (y/n):  ", argument );
+	    sprintf( buf, "\n\rAre you satisfied with the name %s? (y/n): ", argument );
 	    /* Stop multiple logins of the same name */
             for (dt=descriptor_list; dt != NULL; dt=dt->next)
                   if (d != dt && dt->character != NULL
@@ -2188,7 +2188,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    break;
 
 	case 'n': case 'N':
-	    write_to_buffer( d, "Ok, what name would you like to go by? ", 0 );
+	    write_to_buffer( d, "\n\rOk, what name would you like to go by? ", 0 );
 	    nuke_pets( d->character );
 	    free_char( d->character );
 	    d->character = NULL;
@@ -2245,8 +2245,9 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
+	write_to_buffer( d, echo_on_str, 0 );
 	write_to_buffer( d, "\n\rWhat is your sex (M/F)? ", 0 );
-    d->connected = CON_GET_NEW_SEX;
+        d->connected = CON_GET_NEW_SEX;
     break;
 
     case CON_GET_NEW_SEX:
@@ -2260,7 +2261,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 			    break;
 
 	default:
-	    write_to_buffer( d, "That's not a sex.\n\rWhat IS your sex? ", 0 );
+	    write_to_buffer( d, "That's not a sex.\n\rWhat is your sex? ", 0 );
 	    return;
 	}
 
@@ -2425,7 +2426,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    if (iClass >= (MCLT_1))
 		{
 		write_to_buffer( d,
-		    "That's not a first tier class.\n\rWhat class do you choose? (help for more information): ", 0 );
+		    "That's not a class.\n\rWhat class do you choose? (help for more information): ", 0 );
 		return;
 	    }
 	}
@@ -2536,7 +2537,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	}
 	if ( iClass >= ( MCLT_1 ) && ( ch->pcdata->tier != 3 ) ) {
 	    write_to_buffer( d,
-		"That's not a first tier class.\n\rWhat do you choose for your Secondary class? (help for more information): ", 0 );
+		"That's not a class.\n\rWhat do you choose for your Secondary class? (help for more information): ", 0 );
 	    return;
 	}
 	if (iClass == (ch->class - (MCLT_1))) {
@@ -3437,7 +3438,7 @@ void send_to_desc( const char *txt, DESCRIPTOR_DATA *d )
  		    }
  		    *point2 = *point;
  		    *++point2 = '\0';
- 		}			
+ 		}
  		*point2 = '\0';
          	write_to_buffer( d, buf, point2 - buf );
  	    }
@@ -3473,15 +3474,15 @@ void page_to_char_bw( const char *txt, CHAR_DATA *ch )
 	send_to_char(txt,ch);
 	return;
     }
-	
-#if defined(macintosh)
-	send_to_char(txt,ch);
-#else
+
+    #if defined(macintosh)
+    send_to_char(txt,ch);
+    #else
     ch->desc->showstr_head = alloc_mem(strlen(txt) + 1);
     strcpy(ch->desc->showstr_head,txt);
     ch->desc->showstr_point = ch->desc->showstr_head;
     show_string(ch->desc,"");
-#endif
+    #endif
 }
 
 void page_to_char (const char *txt, CHAR_DATA * ch)
@@ -3491,9 +3492,9 @@ void page_to_char (const char *txt, CHAR_DATA * ch)
     char buf[MAX_STRING_LENGTH * 4];
     int skip = 0;
 
-#if defined(macintosh)
+    #if defined(macintosh)
     send_to_char (txt, ch);
-#else
+    #else
     buf[0] = '\0';
     point2 = buf;
     if (txt && ch->desc)
@@ -3563,8 +3564,9 @@ void show_string(struct descriptor_data *d, char *input)
 	return;
     }
 
-    if (d->character)
+    if (d->character){
 	show_lines = d->character->lines;
+    }
     else
 	show_lines = 0;
 
@@ -3595,7 +3597,7 @@ void show_string(struct descriptor_data *d, char *input)
     }
     return;
 }
-	
+
 
 /* quick sex fixer */
 void fix_sex(CHAR_DATA *ch)

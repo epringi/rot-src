@@ -725,7 +725,7 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest )
     ||  obj->value[1] != obj->pIndexData->value[1]
     ||  obj->value[2] != obj->pIndexData->value[2]
     ||  obj->value[3] != obj->pIndexData->value[3]
-    ||  obj->value[4] != obj->pIndexData->value[4]) 
+    ||  obj->value[4] != obj->pIndexData->value[4])
     	fprintf( fp, "Val  %d %d %d %d %d\n",
 	    obj->value[0], obj->value[1], obj->value[2], obj->value[3],
 	    obj->value[4]	     );
@@ -736,19 +736,19 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest )
     case ITEM_SCROLL:
 	if ( obj->value[1] > 0 )
 	{
-	    fprintf( fp, "Spell 1 '%s'\n", 
+	    fprintf( fp, "Spell 1 '%s'\n",
 		skill_table[obj->value[1]].name );
 	}
 
 	if ( obj->value[2] > 0 )
 	{
-	    fprintf( fp, "Spell 2 '%s'\n", 
+	    fprintf( fp, "Spell 2 '%s'\n",
 		skill_table[obj->value[2]].name );
 	}
 
 	if ( obj->value[3] > 0 )
 	{
-	    fprintf( fp, "Spell 3 '%s'\n", 
+	    fprintf( fp, "Spell 3 '%s'\n",
 		skill_table[obj->value[3]].name );
 	}
 
@@ -759,7 +759,7 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest )
     case ITEM_WAND:
 	if ( obj->value[3] > 0 )
 	{
-	    fprintf( fp, "Spell 3 '%s'\n", 
+	    fprintf( fp, "Spell 3 '%s'\n",
 		skill_table[obj->value[3]].name );
 	}
 
