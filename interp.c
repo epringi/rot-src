@@ -339,7 +339,6 @@ const	struct	cmd_type	cmd_table	[] =
     /*
      * Miscellaneous commands.
      */
-    { "codetest",	do_codetest,	POS_DEAD,	IM,  1,  LOG_NORMAL, 1 },
     { "enter", 		do_enter, 	POS_STANDING,	 0,  1,  LOG_NORMAL, 1 },
     { "follow",		do_follow,	POS_RESTING,	 0,  1,  LOG_NORMAL, 1 },
     { "gain",		do_gain,	POS_STANDING,	 0,  1,  LOG_NORMAL, 1 },
@@ -390,11 +389,12 @@ const	struct	cmd_type	cmd_table	[] =
     { "advance",	do_advance,	POS_DEAD,	HE,  1,  LOG_NORMAL, 1 },
     { "chlevel",	do_chlevel,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },
     { "copyover",	do_copyover,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },
+    { "codetest",	do_codetest,	POS_DEAD,	IM,  1,  LOG_ALWAYS, 1 },
     { "authorize",	do_authorize,	POS_DEAD,	IM,  1,  LOG_NORMAL, 1 },
     { "dump",		do_dump,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 0 },
-   { "xpq",	do_xpq,	POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
-   { "pquest",	do_prq,	POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
-   { "gldamb",	do_damq,	POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
+    { "xpq",		do_xpq,		POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
+    { "pquest",		do_prq,		POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
+    { "gldamb",		do_damq,	POS_RESTING,	ML,  1,  LOG_NORMAL, 1 },
     { "trust",		do_trust,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },
     { "violate",	do_violate,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },
     { "rename",		do_rename,	POS_DEAD,	L1,  1,  LOG_NORMAL, 1 },
@@ -419,6 +419,7 @@ const	struct	cmd_type	cmd_table	[] =
     { "wizlock",	do_wizlock,	POS_DEAD,	L2,  1,  LOG_ALWAYS, 1 },
     { "award",		do_award,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },
 
+    { "nomotd",		do_nomotd,	POS_DEAD,	L7,  1,  LOG_NORMAL, 1 },
     { "force",		do_force,	POS_DEAD,	L7,  1,  LOG_NORMAL, 1 },
     { "confiscate",	do_confiscate,	POS_DEAD,	L2,  1,  LOG_NORMAL, 0 },
     { "nuke",		do_nuke,	POS_DEAD,	ML,  1,  LOG_ALWAYS, 1 },

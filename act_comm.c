@@ -2608,26 +2608,14 @@ void do_quit( CHAR_DATA *ch, char *argument )
           send_to_char( "{hReality arrives from somewhere.{x\n\r",ch);
           switch( number_range(1,3) ) {
              case 1:
-                //send_to_char( "{hYou really hit Reality hard!{x\n\r",ch);
-                //send_to_char( "{hReality turns your attack against you!{x\n\r",ch); break;
                 send_to_char( "{hUntil next time, friend!{x\n\r",ch); break;
              case 2:
-                //send_to_char( "{hYour attack misses Reality!!{x\n\r",ch);
-                //send_to_char( "{hReality Rips into your fantasy!!{x\n\r",ch); break;
                 send_to_char( "{hYou leave fantasy behind...{x\n\r",ch); break;
              case 3:
-                //send_to_char( "{hReality's backstab {z{W@@@@@@@{x {z{Y*{xM{z{Y*{xe{z{Y*{xG{z{Y*{xa{z{Y*{xN{z{Y*{xu{z{Y*{xK{z{Y*{xe{z{Y*{x{rs{z{R*{x{W @@@@@@@ You!{x\n\r",ch);break;
                 send_to_char( "{hYour head becomes clearer.{x\n\r",ch); break;
-          }
-          switch( number_range(1,5) ) {
-             case 1: //send_to_char( "{iReality's truth *** DEVASTATES *** you!{x\n\r\n\r",ch); break;
-             case 2: //send_to_char( "{iReality's truth === OBLITERATES === you!{x\n\r\n\r",ch); break;
-             case 3: //send_to_char( "{iReality's truth >>> ANNIHILATES <<< you!{x\n\r\n\r",ch); break;
-             case 4: //send_to_char( "{iReality's truth <<< ERADICATES >>> you!{x\n\r\n\r",ch); break;
-             case 5: //send_to_char( "{iReality's truth does UNSPEAKABLE things to you!{x\n\r\n\r",ch); break;
+             case 4:
                send_to_char( "{iIt trips over your vast imagination.{x\n\r\n\r",ch); break;
           }
-       //send_to_char( "{cYou have been {RKILLED!! (just kidding){x\n\r\n\r", ch );
     }
     WAIT_STATE(ch,15 * PULSE_VIOLENCE);
     act( "$n has left the game.", ch, NULL, NULL, TO_ROOM );
@@ -2656,7 +2644,7 @@ void do_quit( CHAR_DATA *ch, char *argument )
 	{
 	    extract_char(tch,TRUE);
 	    close_socket(d);
-	} 
+	}
     }
 
     return;

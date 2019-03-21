@@ -2083,6 +2083,7 @@ struct	char_data
     long		exbit1_flags;
     long		comm;   /* RT added to pad the vector */
     long		wiznet; /* wiz stuff */
+    bool		motd;
     long		imm_flags;
     long		res_flags;
     long		vuln_flags;

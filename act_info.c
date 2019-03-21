@@ -902,7 +902,7 @@ void do_autoall(CHAR_DATA *ch, char *argument)
 
         send_to_char("All autos turned on.\n\r",ch);
 }
- 
+
 /* RT Commands to replace news, motd, imotd, etc from ROM */
 
 void do_motd(CHAR_DATA *ch, char *argument)
@@ -911,8 +911,19 @@ void do_motd(CHAR_DATA *ch, char *argument)
 }
 
 void do_imotd(CHAR_DATA *ch, char *argument)
-{  
+{
     do_help(ch,"imotd");
+}
+
+void do_nomotd(CHAR_DATA *ch, char *argument){
+    if(ch->motd==FALSE){
+        send_to_char("MOTD turned back on.\n\r", ch);
+        ch->motd=TRUE;
+    }
+    else{
+        send_to_char("MOTD turned off.\n\r", ch);
+        ch->motd=FALSE;
+    }
 }
 
 void do_rules(CHAR_DATA *ch, char *argument)

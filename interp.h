@@ -263,6 +263,7 @@ DECLARE_DO_FUN( do_noclan	);
 DECLARE_DO_FUN(	do_noemote	);
 DECLARE_DO_FUN( do_nofollow	);
 DECLARE_DO_FUN( do_noloot	);
+DECLARE_DO_FUN( do_nomotd	);
 DECLARE_DO_FUN(	do_norestore	);
 DECLARE_DO_FUN(	do_north	);
 DECLARE_DO_FUN(	do_noshout	);

@@ -95,15 +95,15 @@ bool	write_to_descriptor args( ( int desc, char *txt, int length ) );
 void do_codetest( CHAR_DATA *ch, char *argument ){
    char buf[MSL];
 
-
-if(ch->in_room->area->vnum){
-  send_to_char("Yes?", ch);
-   sprintf(buf, "Zone: %d", ch->in_room->area->vnum);
+   sprintf(buf, "MOTD: %i\n\r", ch->motd);
    send_to_char(buf, ch);
-}
-else{
-  send_to_char(":(", ch);
-}
+
+if(ch->motd ==NULL)
+send_to_char("NULL\n\r", ch);
+if(ch->motd ==TRUE)
+send_to_char("TRUE\n\r",ch);
+if(ch->motd ==FALSE)
+send_to_char("FALSE\n\r", ch);
 
    return;
 }

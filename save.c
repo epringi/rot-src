@@ -195,6 +195,13 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
      || !str_cmp( ch->prompt,"<%hhp %mm %vmv %S> " )
      || !str_cmp( ch->prompt,"{c<%hhp %mm %vmv %S>{x " ) )
         fprintf( fp, "Prom %s~\n",      ch->prompt  	);
+    if( ch->motd == NULL || ch->motd == FALSE ){  //asdf motd addition
+        fprintf( fp, "Motd 0\n");
+    }
+    else{
+        fprintf( fp, "Motd 1\n");
+    }
+
     fprintf( fp, "Race %s~\n", race_table[ch->race].name );
     if (ch->questpoints != 0)
 	fprintf( fp, "QuestPnts %d\n", ch->questpoints  );
@@ -206,6 +213,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 //	fprintf( fp, "AQuestNext %d\n", 0               );
     else if (ch->qcountdown == 0)
 	fprintf( fp, "QuestNext %d\n", 0               );
+
     if (ch->clan)
     {
     	fprintf( fp, "Clan %s~\n",clan_table[ch->clan].name);
@@ -258,7 +266,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     if (ch->newbie != 0)
 	fprintf( fp, "New 1\n");
     if(!IS_NPC(ch))
-	fprintf( fp, "Notb  %ld %ld %ld %ld %ld %ld\n",		
+	fprintf( fp, "Notb  %ld %ld %ld %ld %ld %ld\n",
 	ch->pcdata->last_note,ch->pcdata->last_idea,ch->pcdata->last_penalty,
 	ch->pcdata->last_news,ch->pcdata->last_changes,ch->pcdata->last_weddings);
     if(!IS_NPC(ch))
@@ -275,11 +283,11 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     if (ch->platinum > 0)
       fprintf( fp, "Plat %ld\n",	ch->platinum	);
     else
-      fprintf( fp, "Plat %d\n", 0			); 
+      fprintf( fp, "Plat %d\n", 0			);
     if (ch->gold > 0)
       fprintf( fp, "Gold %ld\n",	ch->gold	);
     else
-      fprintf( fp, "Gold %d\n", 0			); 
+      fprintf( fp, "Gold %d\n", 0			);
     if (ch->silver > 0)
 	fprintf( fp, "Silv %ld\n",ch->silver		);
     else
@@ -298,7 +306,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     if (ch->act != 0)
 	fprintf( fp, "Act  %s\n",   print_flags(ch->act));
     if (ch->act2 != 0)
-	fprintf( fp, "Act2  %s\n",   print_flags(ch->act2));	
+	fprintf( fp, "Act2  %s\n",   print_flags(ch->act2));
     if (ch->exbit1_flags != 0)
 	fprintf( fp, "Exbit1  %s\n",   print_flags(ch->exbit1_flags));
     if (ch->affected_by != 0)
@@ -314,7 +322,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	fprintf(fp,"Inco %d\n",ch->incog_level);
     if (ch->ghost_level)
 	fprintf(fp,"Ghos %d\n",ch->ghost_level);
-    fprintf( fp, "Pos  %d\n",	
+    fprintf( fp, "Pos  %d\n",
 	ch->position == POS_FIGHTING ? POS_STANDING : ch->position );
     if (ch->practice != 0)
     	fprintf( fp, "Prac %d\n",	ch->practice	);
@@ -327,7 +335,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	fprintf( fp, "Hit   %d\n",	ch->hitroll	);
     if (ch->damroll != 0)
 	fprintf( fp, "Dam   %d\n",	ch->damroll	);
-    fprintf( fp, "ACs %d %d %d %d\n",	
+    fprintf( fp, "ACs %d %d %d %d\n",
 	ch->armor[0],ch->armor[1],ch->armor[2],ch->armor[3]);
     if (ch->wimpy !=0 )
 	fprintf( fp, "Wimp  %d\n",	ch->wimpy	);
@@ -544,7 +552,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     {
 	if (paf->type < 0 || paf->type>= MAX_SKILL)
 	    continue;
-	
+
 	fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10d\n",
 	    skill_table[paf->type].name,
 	    paf->where,
@@ -564,11 +572,11 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 void fwrite_pet( CHAR_DATA *pet, FILE *fp)
 {
     AFFECT_DATA *paf;
-    
+
     fprintf(fp,"#PET\n");
-    
+
     fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
-    
+
     fprintf(fp,"Name %s~\n", pet->name);
     fprintf(fp,"LogO %ld\n", current_time);
     if (pet->short_descr != pet->pIndexData->short_descr)
@@ -628,22 +636,22 @@ void fwrite_pet( CHAR_DATA *pet, FILE *fp)
 	pet->stance[0], pet->stance[1], pet->stance[2], pet->stance[3],
 	pet->stance[4], pet->stance[5], pet->stance[6], pet->stance[7],
 	pet->stance[8], pet->stance[9], pet->stance[10] );
-    
+
     for ( paf = pet->affected; paf != NULL; paf = paf->next )
     {
     	if (paf->type < 0 || paf->type >= MAX_SKILL)
     	    continue;
-    	    
+
     	fprintf(fp, "Affc '%s' %3d %3d %3d %3d %3d %10d\n",
     	    skill_table[paf->type].name,
     	    paf->where, paf->level, paf->duration, paf->modifier,paf->location,
     	    paf->bitvector);
     }
-    
+
     fprintf(fp,"End\n");
     return;
 }
-    
+
 /*
  * Write an object and its contents.
  */
@@ -944,7 +952,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 
     found = FALSE;
     fclose( fpReserve );
-    
+
     #if defined(unix)
     /* decompress if .gz file exists */
     sprintf( strsave, "%s%s%s", PLAYER_DIR, capitalize(name),".gz");
@@ -1027,7 +1035,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	ch->parts	= race_table[ch->race].parts;
     }
 
-	
+
     /* RT initialize skills */
 
     if (found && ch->version < 2)  /* need to add the new skills */
@@ -1043,7 +1051,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	if (ch->pcdata->tier == 2)
 	    ch->pcdata->learned[gsn_recall] = 75;
     }
- 
+
     /* fix levels */
     if (found && ch->version < 3 && (ch->level > 35 || ch->trust > 35))
     {
@@ -1425,6 +1433,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
+
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -1471,7 +1480,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                     fMatch = TRUE;
                     break;
                 }
- 
+
                 ch->pcdata->alias[count]        = str_dup(fread_word(fp));
                 ch->pcdata->alias_sub[count]    = fread_string(fp);
                 count++;
@@ -1524,15 +1533,15 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
             {
                 AFFECT_DATA *paf;
                 int sn;
- 
+
                 paf = new_affect();
- 
+
                 sn = skill_lookup(fread_word(fp));
                 if (sn < 0)
                     bug("Fread_char: unknown skill.",0);
                 else
                     paf->type = sn;
- 
+
                 paf->where  = fread_number(fp);
                 paf->level      = fread_number( fp );
                 paf->duration   = fread_number( fp );
@@ -1682,8 +1691,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                         LOAD_COLOUR (answer_text) fMatch = TRUE;
                     break;
                 }
-	    KEY("Comm",		ch->comm,		fread_flag( fp ) ); 
-          
+	    KEY("Comm",		ch->comm,		fread_flag( fp ) );
+
 	    break;
 
 	case 'D':
@@ -1701,7 +1710,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                     fMatch = TRUE;
                     break;
                 }
- 
+
                 ch->pcdata->dupes[dcount]        = fread_string(fp);
                 dcount++;
                 fMatch = TRUE;
@@ -1716,7 +1725,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     		percent = (current_time - lastlogoff) * 25 / ( 2 * 60 * 60);
 
 		percent = UMIN(percent,100);
- 
+
     		if (percent > 0 && !IS_AFFECTED(ch,AFF_POISON)
     		&&  !IS_AFFECTED(ch,AFF_PLAGUE))
     		{
@@ -1739,7 +1748,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                     fMatch = TRUE;
                     break;
                 }
- 
+
                 ch->pcdata->forget[fcount]        = fread_string(fp);
                 fcount++;
                 fMatch = TRUE;
@@ -1753,7 +1762,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
             {
                 int gn;
                 char *temp;
- 
+
                 temp = fread_word( fp ) ;
                 gn = group_lookup(temp);
                 /* gn    = group_lookup( fread_word( fp ) ); */
@@ -1794,7 +1803,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                 fMatch = TRUE;
                 break;
             }
-      
+
 	    break;
 
 	case 'I':
@@ -1823,6 +1832,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 
 	case 'M':
 	    KEY( "Mudl",	ch->pcdata->last_mud,	fread_number( fp ) );
+	    KEY( "Motd",	ch->motd,		fread_number( fp ) ); //asdf motd integration
 	    break;
 
 	case 'N':
@@ -2015,7 +2025,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     if (!str_cmp(word,"Vnum"))
     {
     	int vnum;
-    	
+
     	vnum = fread_number(fp);
     	if (get_mob_index(vnum) == NULL)
 	{
@@ -2030,12 +2040,12 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
         bug("Fread_pet: no vnum in file.",0);
         pet = create_mobile(get_mob_index(MOB_VNUM_FIDO));
     }
-    
+
     for ( ; ; )
     {
     	word 	= feof(fp) ? "END" : fread_word(fp);
     	fMatch = FALSE;
-    	
+
     	switch (UPPER(word[0]))
     	{
     	case '*':
