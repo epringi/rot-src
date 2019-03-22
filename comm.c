@@ -721,20 +721,21 @@ void game_loop_mac_msdos( void )
 	/* OLC */
 	        if ( d->showstr_point )
 	            show_string( d, d->incomm );
-	        else
-	        if ( d->pString )
-	            string_add( d->character, d->incomm );
 	        else{
-	            switch ( d->connected )
-	            {
-	                case CON_PLAYING:
-			    if ( !run_olc_editor( d ) )
-				substitute_alias( d, d->incomm );
-			    break;
-	                default:
-			    nanny( d, d->incomm );
-			    break;
-	            }
+	            if ( d->pString )
+	                string_add( d->character, d->incomm );
+	            else{
+	                switch ( d->connected )
+	                {
+	                    case CON_PLAYING:
+			        if ( !run_olc_editor( d ) )
+				    substitute_alias( d, d->incomm );
+			        break;
+	                    default:
+			        nanny( d, d->incomm );
+			        break;
+	                }
+                    }
                 }
 
 
@@ -821,9 +822,9 @@ void game_loop_unix( int control )
     static struct timeval null_time;
     struct timeval last_time;
 
-    #if !defined( AmigaTCP ) && !defined( WIN32 )
+#if !defined( AmigaTCP ) && !defined( WIN32 )
     signal( SIGPIPE, SIG_IGN );
-    #endif
+#endif
     gettimeofday( &last_time, NULL );
     current_time = (time_t) last_time.tv_sec;
 
@@ -836,10 +837,10 @@ void game_loop_unix( int control )
 	DESCRIPTOR_DATA *d;
 	int maxdesc;
 
-        #if defined(MALLOC_DEBUG)
+#if defined(MALLOC_DEBUG)
 	if ( malloc_verify( ) != 1 )
 	    abort( );
-        #endif
+#endif
 
 	/*
 	 * Poll all active descriptors.
@@ -896,7 +897,7 @@ void game_loop_unix( int control )
 	 */
 	for ( d = descriptor_list; d != NULL; d = d_next )
 	{
-	    d_next = d->next;
+	    d_next = d->next;   
 	    if ( FD_ISSET( d->descriptor, &exc_set ) )
 	    {
 		FD_CLR( d->descriptor, &in_set  );
@@ -947,25 +948,25 @@ void game_loop_unix( int control )
 		stop_idling( d->character );
 
 		/* OLC */
-		if ( d->showstr_point )
-		    show_string( d, d->incomm );
-		else{
-		    if ( d->pString )
-		        string_add( d->character, d->incomm );
-		    else{
-		        switch ( d->connected ){
-		            case CON_PLAYING:
-			        if ( !run_olc_editor( d ) )
-	    		            substitute_alias( d, d->incomm );
-			            break;
-		            default:
-			        nanny( d, d->incomm );
-	                        break;
-	                }
+	if ( d->showstr_point )
+	    show_string( d, d->incomm );
+	else
+	if ( d->pString )
+	    string_add( d->character, d->incomm );
+	else
+	    switch ( d->connected )
+	    {
+	        case CON_PLAYING:
+		    if ( !run_olc_editor( d ) )
+    		        substitute_alias( d, d->incomm );
+		    break;
+	        default:
 
-			d->incomm[0] = '\0';
-	            }
-	        }
+		    nanny( d, d->incomm );
+                break;
+          }
+
+		d->incomm[0]	= '\0';
 	    }
 	}
 
@@ -1645,7 +1646,6 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
     bool found;
     const char *dir_name[] = {"n","e","s","w","u","d"};
     int door;
-    int exits;
 
     ch=d->character;
 
@@ -1681,7 +1681,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
             case 'e':
                 found = FALSE;
                 doors[0] = '\0';
-                for (door = 0, exits = 0; door < 6; door++)
+                for (door = 0; door < 6; door++)
                 {
                     if ((pexit = ch->in_room->exit[door]) != NULL
                         && pexit->u1.to_room != NULL
@@ -1691,8 +1691,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
                         && !IS_SET (pexit->exit_info, EX_CLOSED))
                     {
                         found = TRUE;
-                        exits ++;
-                        if(exits >= 2){
+                        if(door >= 1){
                             strcat (doors, ",");
                         }
                         strcat (doors, dir_name[door]);
@@ -2129,6 +2128,101 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	}
 	break;
 
+    case CON_GET_OLD_PASSWORD:
+    #if defined(unix)
+	write_to_buffer( d, "\n\r", 2 );
+    #endif
+
+	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ))
+	{
+	    write_to_buffer( d, "Wrong password.\n\r", 0 );
+	    close_socket( d );
+	    return;
+	}
+
+	write_to_buffer( d, echo_on_str, 0 );
+
+	if (check_playing(d,ch->name))
+	    return;
+
+	ch->pcdata->socket = str_dup( d->host );
+	if ( check_reconnect( d, ch->name, TRUE ) )
+	    return;
+
+	sprintf( log_buf, "%s@%s has joined the game", ch->name, d->host );
+	log_string( log_buf );
+	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
+        SET_BIT(ch->act, PLR_COLOUR);
+	ch->pcdata->socket = str_dup( d->host );
+
+	if (IS_SET(ch->act, PLR_SECOND ) || IS_SET(ch->act, PLR_THIRD  ) )
+	{
+	    long act;
+
+	    act = ch->act;
+    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
+	    sprintf(newbuf, "%s", str_dup( ch->pcdata->pwd ));
+	    sprintf( argument, "%s", capitalize( ch->name ) );
+	    nuke_pets( d->character );
+	    free_char( d->character );
+	    d->character = NULL;
+	    fOld = load_char_reroll( d, argument );
+	    ch   = d->character;
+	    free_string( ch->pcdata->pwd );
+	    ch->pcdata->pwd	= str_dup( newbuf );
+	    newbuf[0] = '\0';
+		if (IS_SET(act, PLR_SECOND ) )
+			 ch->pcdata->tier = 1;
+	    else
+			 ch->pcdata->tier = 2;
+	    ch->pcdata->socket = str_dup( d->host );
+	    write_to_buffer( d, echo_on_str, 0 );
+/*
+	    write_to_buffer(d,"The following races are available:\n\r\n\r",0);
+ */
+	    pos = 0;
+/*
+	    for ( race = 1; race_table[race].name != NULL; race++ )
+	    {
+		if (!race_table[race].pc_race)
+		    break;
+		sprintf(newbuf, "%6s%-24s", " ", race_table[race].name);
+		write_to_buffer(d,newbuf,0);
+		pos++;
+		if (pos >= 2) {
+		    write_to_buffer(d,"\n\r",1);
+		    pos = 0;
+		}
+	    }
+ */
+	    newbuf[0] = '\0';
+	    // write_to_buffer(d,"What is your race (help for more information)? ",0);
+	write_to_buffer( d, "What is your sex, (M)ale or (F)emale? ", 0 );
+	    d->connected = CON_GET_NEW_SEX;
+	    break;
+	}
+       if (IS_IMMORTAL(ch)) {
+           write_to_buffer(d, "Would you like to login (W)izi, (I)ncognito, or (N)ormal? ", 0);
+	    d->connected = CON_GET_WIZI;
+          break;
+       } else {
+	    do_help( ch, "motd" );
+	    d->connected = CON_READ_MOTD;
+        }
+
+	for (pos = 0; pos < MAX_DUPES; pos++)
+	{
+	    if (ch->pcdata->dupes[pos] == NULL)
+		break;
+
+	    if ( ( victim = get_char_mortal( ch, str_dup(ch->pcdata->dupes[pos]) ) ) != NULL )
+		force_quit(victim, "");
+	}
+
+	check_robbed( ch );
+
+	break;
+
     /* RT code for breaking link */
 
     case CON_BREAK_CONNECT:
@@ -2247,9 +2341,8 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
-	write_to_buffer( d, echo_on_str, 0 );
 	write_to_buffer( d, "\n\rWhat is your sex (M/F)? ", 0 );
-        d->connected = CON_GET_NEW_SEX;
+    d->connected = CON_GET_NEW_SEX;
     break;
 
     case CON_GET_NEW_SEX:
@@ -2615,137 +2708,94 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         }
 	break;
 
-    case CON_GET_OLD_PASSWORD:
-    #if defined(unix)
-	write_to_buffer( d, "\n\r", 2 );
-    #endif
-
-	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ))
+    case CON_PICK_WEAPON:
+	write_to_buffer(d,"\n\r",2);
+	weapon = weapon_lookup(argument);
+	if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
 	{
-	    write_to_buffer( d, "Wrong password.\n\r", 0 );
-	    close_socket( d );
+	    write_to_buffer(d,
+		"That's not a valid selection. Choices are:\n\r",0);
+            buf[0] = '\0';
+            for ( i = 0; weapon_table[i].name != NULL; i++)
+                if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
+                {
+                    strcat(buf,weapon_table[i].name);
+		    strcat(buf," ");
+                }
+            strcat(buf,"\n\rYour choice? ");
+            write_to_buffer(d,buf,0);
 	    return;
 	}
 
-	write_to_buffer( d, echo_on_str, 0 );
+	ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
+	write_to_buffer(d,"\n\r",2);
+	do_help(ch,"motd");
+	d->connected = CON_READ_MOTD;
+	break;
 
-	if (check_playing(d,ch->name))
-	    return;
-
-	ch->pcdata->socket = str_dup( d->host );
-	if ( check_reconnect( d, ch->name, TRUE ) )
-	    return;
-
-	sprintf( log_buf, "%s@%s has joined the game", ch->name, d->host );
-	log_string( log_buf );
-	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
-        SET_BIT(ch->act, PLR_COLOUR);
-	ch->pcdata->socket = str_dup( d->host );
-
-	if (IS_SET(ch->act, PLR_SECOND ) || IS_SET(ch->act, PLR_THIRD  ) )
-	{
-	    long act;
-
-	    act = ch->act;
-    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
-	    sprintf(newbuf, "%s", str_dup( ch->pcdata->pwd ));
-	    sprintf( argument, "%s", capitalize( ch->name ) );
-	    nuke_pets( d->character );
-	    free_char( d->character );
-	    d->character = NULL;
-	    fOld = load_char_reroll( d, argument );
-	    ch   = d->character;
-	    free_string( ch->pcdata->pwd );
-	    ch->pcdata->pwd	= str_dup( newbuf );
-	    newbuf[0] = '\0';
-            if (IS_SET(act, PLR_SECOND ) )
-		 ch->pcdata->tier = 1;
-	    else
-		 ch->pcdata->tier = 2;
-	    ch->pcdata->socket = str_dup( d->host );
-	    write_to_buffer( d, echo_on_str, 0 );
-/*
-	    write_to_buffer(d,"The following races are available:\n\r\n\r",0);
- */
-	    pos = 0;
-/*
-	    for ( race = 1; race_table[race].name != NULL; race++ )
-	    {
-		if (!race_table[race].pc_race)
-		    break;
-		sprintf(newbuf, "%6s%-24s", " ", race_table[race].name);
-		write_to_buffer(d,newbuf,0);
-		pos++;
-		if (pos >= 2) {
-		    write_to_buffer(d,"\n\r",1);
-		    pos = 0;
-		}
-	    }
- */
-	    newbuf[0] = '\0';
-	    // write_to_buffer(d,"What is your race (help for more information)? ",0);
-	    write_to_buffer( d, "What is your sex, (M)ale or (F)emale? ", 0 );
-	    d->connected = CON_GET_NEW_SEX;
-	    break;
-	}
-        if (IS_IMMORTAL(ch)) {
-            write_to_buffer(d, "Would you like to login (W)izi, (I)ncognito, or (N)ormal? ", 0);
-	    d->connected = CON_GET_WIZI;
+    case CON_GEN_GROUPS:
+	send_to_char("\n\r",ch);
+       	if (!str_cmp(argument,"done"))
+       	{
+	    sprintf(buf,"Creation points: %d\n\r",ch->pcdata->points);
+	    send_to_char(buf,ch);
+	    sprintf(buf,"Experience per level: %ld\n\r",
+	            (long)exp_per_level(ch,ch->gen_data->points_chosen));
+	    if (ch->pcdata->points < 40)
+		ch->train = (40 - ch->pcdata->points + 1) / 2;
+	    free_gen_data(ch->gen_data);
+	    ch->gen_data = NULL;
+	    send_to_char(buf,ch);
+            write_to_buffer( d, "\n\r", 2 );
+            write_to_buffer(d,"Please pick a weapon from the following choices:\n\r",0);
+            buf[0] = '\0';
+            for ( i = 0; weapon_table[i].name != NULL; i++)
+                if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
+                {
+                    strcat(buf,weapon_table[i].name);
+		    strcat(buf," ");
+                }
+            strcat(buf,"\n\rYour choice? ");
+            write_to_buffer(d,buf,0);
+            d->connected = CON_PICK_WEAPON;
             break;
         }
 
-        for (pos = 0; pos < MAX_DUPES; pos++)
-        {
-	     if (ch->pcdata->dupes[pos] == NULL)
-		  break;
+        if (!parse_gen_groups(ch,argument))
+           send_to_char( "Choices are: list, learned, premise, add, drop, info, help, and done: ",ch);
 
-	     if ( ( victim = get_char_mortal( ch, str_dup(ch->pcdata->dupes[pos]) ) ) != NULL )
-		 force_quit(victim, "");
-        }
+        //do_help(ch,"menu choice"); // Whyyyy
+        break;
 
+   case CON_READ_IMOTD:
+	write_to_buffer(d,"\n\r",2);
+        do_help( ch, "motd" );
         d->connected = CON_READ_MOTD;
-
-        check_robbed( ch );
-
-        if(ch->motd == TRUE){
-             do_help(ch,"motd");
-             break;
-        }
-
-        //--  This now continues to the next case (CON_READ_MOTD) through CON_GET_WIZI.
-        //break;
+	break;
 
     case CON_GET_WIZI:
-        if (IS_IMMORTAL(ch)) {  // This if is here because the previous case continues through this case to get to the next, not actually redundant.
-            write_to_buffer(d, "\n\r", 2);
-            switch (*argument) {
-                case 'w': case 'W':
-                    ch->invis_level = ch->level;
-                    break; // Finish this state and do MOTD stuff..
-                case 'i': case 'I':
-                    ch->incog_level = ch->level;
-                    break; // Finish this state and do MOTD stuff..
-                case 'n': case 'N':
-                    ch->incog_level = 0;
-                    ch->invis_level = 0;
-                    break; // Finish this state and do MOTD stuff..
-                default:
-                    write_to_buffer(d, "That is not a choice. What is your choice? ", 0);
-                    return; // Stay in this state to choose again.
-            }
-
-            if(ch->motd == TRUE){
-                d->connected = CON_READ_IMOTD;
-	        do_help( ch, "imotd" );
-                break;
-            }
-            else{
-                d->connected = CON_READ_MOTD; // This now continues to the next case (CON_READ_MOTD).
-            }
+        write_to_buffer(d, "\n\r", 2);
+        switch (*argument) {
+            case 'w': case 'W':
+                ch->invis_level = ch->level;
+                break; // Finish this state and do MOTD stuff..
+            case 'i': case 'I':
+                ch->incog_level = ch->level;
+                break; // Finish this state and do MOTD stuff..
+            case 'n': case 'N':
+                ch->incog_level = 0;
+                ch->invis_level = 0;
+                break; // Finish this state and do MOTD stuff..
+            default:
+                write_to_buffer(d,
+                    "That is not a choice. What IS your choice? ", 0);
+                return; // Stay in this state to choose again.
         }
+	do_help( ch, "imotd" );
+        d->connected = CON_READ_IMOTD;
         // End of CON_GET_WIZI.
+    break;
 
-    //--  CON_GET_WIZI and CON_GET_OLD_PASSWORD continues onto here, don't insert cases between them and CON_READ_MOTD.
     case CON_READ_MOTD:
         if ( ch->pcdata == NULL || ch->pcdata->pwd[0] == '\0')
         {
@@ -2755,7 +2805,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
                 "Type 'password null <new password>' to fix.\n\r",0);
         }
 
-	write_to_buffer( d, "\n\rWelcome!\n\r\n\r", 0 );
+	write_to_buffer( d, "\n\rWelcome!\n\r", 0 );
 	ch->next	= char_list;
 	char_list	= ch;
 	d->connected	= CON_PLAYING;
@@ -2832,8 +2882,6 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	}
 
 	act( "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
-	do_unread(ch,"");
-        send_to_char("\n\r", ch);
 	do_look( ch, "auto" );
 
 	wiznet("$N has left real life behind.",ch,NULL,
@@ -2845,74 +2893,10 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    act("$n has entered the game.",ch->pet,NULL,NULL,TO_ROOM);
 	}
 
+	do_unread(ch,"");
+
 	check_robbed( ch );
 
-	break;
-
-    case CON_PICK_WEAPON:
-	write_to_buffer(d,"\n\r",2);
-	weapon = weapon_lookup(argument);
-	if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
-	{
-	    write_to_buffer(d,
-		"That's not a valid selection. Choices are:\n\r",0);
-            buf[0] = '\0';
-            for ( i = 0; weapon_table[i].name != NULL; i++)
-                if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
-                {
-                    strcat(buf,weapon_table[i].name);
-		    strcat(buf," ");
-                }
-            strcat(buf,"\n\rYour choice? ");
-            write_to_buffer(d,buf,0);
-	    return;
-	}
-
-	ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
-	write_to_buffer(d,"\n\r",2);
-        ch->motd=TRUE;
-	do_help(ch,"motd");
-	d->connected = CON_READ_MOTD;
-	break;
-
-    case CON_GEN_GROUPS:
-	send_to_char("\n\r",ch);
-       	if (!str_cmp(argument,"done"))
-       	{
-	    sprintf(buf,"Creation points: %d\n\r",ch->pcdata->points);
-	    send_to_char(buf,ch);
-	    sprintf(buf,"Experience per level: %ld\n\r",
-	            (long)exp_per_level(ch,ch->gen_data->points_chosen));
-	    if (ch->pcdata->points < 40)
-		ch->train = (40 - ch->pcdata->points + 1) / 2;
-	    free_gen_data(ch->gen_data);
-	    ch->gen_data = NULL;
-	    send_to_char(buf,ch);
-            write_to_buffer( d, "\n\r", 2 );
-            write_to_buffer(d,"Please pick a weapon from the following choices:\n\r",0);
-            buf[0] = '\0';
-            for ( i = 0; weapon_table[i].name != NULL; i++)
-                if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
-                {
-                    strcat(buf,weapon_table[i].name);
-		    strcat(buf," ");
-                }
-            strcat(buf,"\n\rYour choice? ");
-            write_to_buffer(d,buf,0);
-            d->connected = CON_PICK_WEAPON;
-            break;
-        }
-
-        if (!parse_gen_groups(ch,argument))
-           send_to_char( "Choices are: list, learned, premise, add, drop, info, help, and done: ",ch);
-
-        //do_help(ch,"menu choice"); // Whyyyy
-        break;
-
-    case CON_READ_IMOTD:
-	write_to_buffer(d,"\n\r",2);
-        do_help(ch,"motd");
-        d->connected = CON_READ_MOTD;
 	break;
 
     case CON_MUD_GET_NAME:
@@ -3080,7 +3064,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
     case CON_REROLL:
         #if defined(unix)
-	    write_to_buffer( d, "\n\r", 2 );
+	write_to_buffer( d, "\n\r", 2 );
         #endif
 
 	sprintf( log_buf, "%s@%s is recreating.", ch->name, d->host );
@@ -3108,7 +3092,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    else if (IS_SET(act, PLR_THIRD ) )
 		ch->pcdata->tier = 2;
 	    else if (IS_SET(act, PLR2_FOURTH ) )
-		ch->pcdata->tier = 3; 
+		ch->pcdata->tier = 3;
 	    else
 		ch->pcdata->tier = 0;
 	    ch->pcdata->socket = str_dup( d->host );
@@ -3440,7 +3424,7 @@ void send_to_desc( const char *txt, DESCRIPTOR_DATA *d )
  		    }
  		    *point2 = *point;
  		    *++point2 = '\0';
- 		}
+ 		}			
  		*point2 = '\0';
          	write_to_buffer( d, buf, point2 - buf );
  	    }
@@ -3476,15 +3460,15 @@ void page_to_char_bw( const char *txt, CHAR_DATA *ch )
 	send_to_char(txt,ch);
 	return;
     }
-
-    #if defined(macintosh)
-    send_to_char(txt,ch);
-    #else
+	
+#if defined(macintosh)
+	send_to_char(txt,ch);
+#else
     ch->desc->showstr_head = alloc_mem(strlen(txt) + 1);
     strcpy(ch->desc->showstr_head,txt);
     ch->desc->showstr_point = ch->desc->showstr_head;
     show_string(ch->desc,"");
-    #endif
+#endif
 }
 
 void page_to_char (const char *txt, CHAR_DATA * ch)
@@ -3494,9 +3478,9 @@ void page_to_char (const char *txt, CHAR_DATA * ch)
     char buf[MAX_STRING_LENGTH * 4];
     int skip = 0;
 
-    #if defined(macintosh)
+#if defined(macintosh)
     send_to_char (txt, ch);
-    #else
+#else
     buf[0] = '\0';
     point2 = buf;
     if (txt && ch->desc)
@@ -3566,9 +3550,8 @@ void show_string(struct descriptor_data *d, char *input)
 	return;
     }
 
-    if (d->character){
+    if (d->character)
 	show_lines = d->character->lines;
-    }
     else
 	show_lines = 0;
 
@@ -3593,13 +3576,13 @@ void show_string(struct descriptor_data *d, char *input)
         	    }
         	    d->showstr_point  = 0;
     		}
-            }
+	    }
 	    return;
 	}
     }
     return;
 }
-
+	
 
 /* quick sex fixer */
 void fix_sex(CHAR_DATA *ch)
