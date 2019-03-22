@@ -2128,101 +2128,6 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	}
 	break;
 
-    case CON_GET_OLD_PASSWORD:
-    #if defined(unix)
-	write_to_buffer( d, "\n\r", 2 );
-    #endif
-
-	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ))
-	{
-	    write_to_buffer( d, "Wrong password.\n\r", 0 );
-	    close_socket( d );
-	    return;
-	}
-
-	write_to_buffer( d, echo_on_str, 0 );
-
-	if (check_playing(d,ch->name))
-	    return;
-
-	ch->pcdata->socket = str_dup( d->host );
-	if ( check_reconnect( d, ch->name, TRUE ) )
-	    return;
-
-	sprintf( log_buf, "%s@%s has joined the game", ch->name, d->host );
-	log_string( log_buf );
-	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
-        SET_BIT(ch->act, PLR_COLOUR);
-	ch->pcdata->socket = str_dup( d->host );
-
-	if (IS_SET(ch->act, PLR_SECOND ) || IS_SET(ch->act, PLR_THIRD  ) )
-	{
-	    long act;
-
-	    act = ch->act;
-    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
-	    sprintf(newbuf, "%s", str_dup( ch->pcdata->pwd ));
-	    sprintf( argument, "%s", capitalize( ch->name ) );
-	    nuke_pets( d->character );
-	    free_char( d->character );
-	    d->character = NULL;
-	    fOld = load_char_reroll( d, argument );
-	    ch   = d->character;
-	    free_string( ch->pcdata->pwd );
-	    ch->pcdata->pwd	= str_dup( newbuf );
-	    newbuf[0] = '\0';
-		if (IS_SET(act, PLR_SECOND ) )
-			 ch->pcdata->tier = 1;
-	    else
-			 ch->pcdata->tier = 2;
-	    ch->pcdata->socket = str_dup( d->host );
-	    write_to_buffer( d, echo_on_str, 0 );
-/*
-	    write_to_buffer(d,"The following races are available:\n\r\n\r",0);
- */
-	    pos = 0;
-/*
-	    for ( race = 1; race_table[race].name != NULL; race++ )
-	    {
-		if (!race_table[race].pc_race)
-		    break;
-		sprintf(newbuf, "%6s%-24s", " ", race_table[race].name);
-		write_to_buffer(d,newbuf,0);
-		pos++;
-		if (pos >= 2) {
-		    write_to_buffer(d,"\n\r",1);
-		    pos = 0;
-		}
-	    }
- */
-	    newbuf[0] = '\0';
-	    // write_to_buffer(d,"What is your race (help for more information)? ",0);
-	write_to_buffer( d, "What is your sex, (M)ale or (F)emale? ", 0 );
-	    d->connected = CON_GET_NEW_SEX;
-	    break;
-	}
-       if (IS_IMMORTAL(ch)) {
-           write_to_buffer(d, "Would you like to login (W)izi, (I)ncognito, or (N)ormal? ", 0);
-	    d->connected = CON_GET_WIZI;
-          break;
-       } else {
-	    do_help( ch, "motd" );
-	    d->connected = CON_READ_MOTD;
-        }
-
-	for (pos = 0; pos < MAX_DUPES; pos++)
-	{
-	    if (ch->pcdata->dupes[pos] == NULL)
-		break;
-
-	    if ( ( victim = get_char_mortal( ch, str_dup(ch->pcdata->dupes[pos]) ) ) != NULL )
-		force_quit(victim, "");
-	}
-
-	check_robbed( ch );
-
-	break;
-
     /* RT code for breaking link */
 
     case CON_BREAK_CONNECT:
@@ -2767,13 +2672,111 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         //do_help(ch,"menu choice"); // Whyyyy
         break;
 
-   case CON_READ_IMOTD:
+    case CON_READ_IMOTD:
 	write_to_buffer(d,"\n\r",2);
         do_help( ch, "motd" );
         d->connected = CON_READ_MOTD;
 	break;
 
+    case CON_GET_OLD_PASSWORD:
+    #if defined(unix)
+	write_to_buffer( d, "\n\r", 2 );
+    #endif
+
+	if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ))
+	{
+	    write_to_buffer( d, "Wrong password.\n\r", 0 );
+	    close_socket( d );
+	    return;
+	}
+
+	write_to_buffer( d, echo_on_str, 0 );
+
+	if (check_playing(d,ch->name))
+	    return;
+
+	ch->pcdata->socket = str_dup( d->host );
+	if ( check_reconnect( d, ch->name, TRUE ) )
+	    return;
+
+	sprintf( log_buf, "%s@%s has joined the game", ch->name, d->host );
+	log_string( log_buf );
+	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
+        SET_BIT(ch->act, PLR_COLOUR);
+	ch->pcdata->socket = str_dup( d->host );
+
+	if (IS_SET(ch->act, PLR_SECOND ) || IS_SET(ch->act, PLR_THIRD  ) )
+	{
+	    long act;
+
+	    act = ch->act;
+    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
+	    sprintf(newbuf, "%s", str_dup( ch->pcdata->pwd ));
+	    sprintf( argument, "%s", capitalize( ch->name ) );
+	    nuke_pets( d->character );
+	    free_char( d->character );
+	    d->character = NULL;
+	    fOld = load_char_reroll( d, argument );
+	    ch   = d->character;
+	    free_string( ch->pcdata->pwd );
+	    ch->pcdata->pwd	= str_dup( newbuf );
+	    newbuf[0] = '\0';
+		if (IS_SET(act, PLR_SECOND ) )
+			 ch->pcdata->tier = 1;
+	    else
+			 ch->pcdata->tier = 2;
+	    ch->pcdata->socket = str_dup( d->host );
+	    write_to_buffer( d, echo_on_str, 0 );
+/*
+	    write_to_buffer(d,"The following races are available:\n\r\n\r",0);
+ */
+	    pos = 0;
+/*
+	    for ( race = 1; race_table[race].name != NULL; race++ )
+	    {
+		if (!race_table[race].pc_race)
+		    break;
+		sprintf(newbuf, "%6s%-24s", " ", race_table[race].name);
+		write_to_buffer(d,newbuf,0);
+		pos++;
+		if (pos >= 2) {
+		    write_to_buffer(d,"\n\r",1);
+		    pos = 0;
+		}
+	    }
+ */
+	    newbuf[0] = '\0';
+	    // write_to_buffer(d,"What is your race (help for more information)? ",0);
+	write_to_buffer( d, "What is your sex, (M)ale or (F)emale? ", 0 );
+	    d->connected = CON_GET_NEW_SEX;
+	    break;
+	}
+        if (IS_IMMORTAL(ch)) {
+           write_to_buffer(d, "Would you like to login (W)izi, (I)ncognito, or (N)ormal? ", 0);
+	   d->connected = CON_GET_WIZI;
+           break;
+        }
+
+	for (pos = 0; pos < MAX_DUPES; pos++)
+	{
+	    if (ch->pcdata->dupes[pos] == NULL)
+		break;
+
+	    if ( ( victim = get_char_mortal( ch, str_dup(ch->pcdata->dupes[pos]) ) ) != NULL )
+		force_quit(victim, "");
+	}
+
+        d->connected = CON_READ_MOTD;
+
+	check_robbed( ch );
+
+        if(ch->motd == TRUE){
+	    do_help( ch, "motd" );
+	    break;
+        }
+
     case CON_GET_WIZI:
+        if(d->connected == CON_GET_WIZI){
         write_to_buffer(d, "\n\r", 2);
         switch (*argument) {
             case 'w': case 'W':
@@ -2791,10 +2794,16 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
                     "That is not a choice. What IS your choice? ", 0);
                 return; // Stay in this state to choose again.
         }
-	do_help( ch, "imotd" );
-        d->connected = CON_READ_IMOTD;
+	if(ch->motd == TRUE){
+            do_help( ch, "imotd" );
+            d->connected = CON_READ_IMOTD;
+            break;
+        }
+        else{
+            d->connected = CON_READ_MOTD;
+        }
+        }
         // End of CON_GET_WIZI.
-    break;
 
     case CON_READ_MOTD:
         if ( ch->pcdata == NULL || ch->pcdata->pwd[0] == '\0')
