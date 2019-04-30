@@ -1646,6 +1646,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
     bool found;
     const char *dir_name[] = {"n","e","s","w","u","d"};
     int door;
+    int exits;
 
     ch=d->character;
 
@@ -1681,7 +1682,7 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
             case 'e':
                 found = FALSE;
                 doors[0] = '\0';
-                for (door = 0; door < 6; door++)
+                for (door = 0, exits = 0; door < 6; door++)
                 {
                     if ((pexit = ch->in_room->exit[door]) != NULL
                         && pexit->u1.to_room != NULL
@@ -1691,7 +1692,8 @@ void bust_a_prompt (DESCRIPTOR_DATA *d)
                         && !IS_SET (pexit->exit_info, EX_CLOSED))
                     {
                         found = TRUE;
-                        if(door >= 1){
+                        exits ++;
+                        if(exits >= 2){
                             strcat (doors, ",");
                         }
                         strcat (doors, dir_name[door]);
@@ -2777,31 +2779,30 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
     case CON_GET_WIZI:
         if(d->connected == CON_GET_WIZI){
-        write_to_buffer(d, "\n\r", 2);
-        switch (*argument) {
-            case 'w': case 'W':
-                ch->invis_level = ch->level;
-                break; // Finish this state and do MOTD stuff..
-            case 'i': case 'I':
-                ch->incog_level = ch->level;
-                break; // Finish this state and do MOTD stuff..
-            case 'n': case 'N':
-                ch->incog_level = 0;
-                ch->invis_level = 0;
-                break; // Finish this state and do MOTD stuff..
-            default:
-                write_to_buffer(d,
-                    "That is not a choice. What IS your choice? ", 0);
-                return; // Stay in this state to choose again.
-        }
-	if(ch->motd == TRUE){
-            do_help( ch, "imotd" );
-            d->connected = CON_READ_IMOTD;
-            break;
-        }
-        else{
-            d->connected = CON_READ_MOTD;
-        }
+            write_to_buffer(d, "\n\r", 2);
+            switch (*argument) {
+                case 'w': case 'W':
+                    ch->invis_level = ch->level;
+                    break; // Finish this state and do MOTD stuff..
+                case 'i': case 'I':
+                    ch->incog_level = ch->level;
+                    break; // Finish this state and do MOTD stuff..
+                case 'n': case 'N':
+                    ch->incog_level = 0;
+                    ch->invis_level = 0;
+                    break; // Finish this state and do MOTD stuff..
+                default:
+                    write_to_buffer(d, "That is not a choice. What IS your choice? ", 0);
+                    return; // Stay in this state to choose again.
+            }
+	    if(ch->motd == TRUE){
+                do_help( ch, "imotd" );
+                d->connected = CON_READ_IMOTD;
+                break;
+            }
+            else{
+                d->connected = CON_READ_MOTD;
+            }
         }
         // End of CON_GET_WIZI.
 
@@ -2891,6 +2892,10 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	}
 
 	act( "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
+
+	do_unread(ch,"");
+        send_to_char("\n\r", ch);
+
 	do_look( ch, "auto" );
 
 	wiznet("$N has left real life behind.",ch,NULL,
@@ -2901,8 +2906,6 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    char_to_room(ch->pet,ch->in_room);
 	    act("$n has entered the game.",ch->pet,NULL,NULL,TO_ROOM);
 	}
-
-	do_unread(ch,"");
 
 	check_robbed( ch );
 
