@@ -392,10 +392,13 @@ void boot_db()
      */
     {
 	FILE *fpList;
+	char strAreaFile[80];
 
-    log_string( "Reading Area List." );
+	sprintf(strAreaFile, "%s%s", AREA_DIR, AREA_LIST);
+	log_string(strAreaFile);
+	log_string( "Reading Area List." );
 	strcat(boot_buf,"ns of the\n\r  thre");
-	if ( ( fpList = fopen( AREA_LIST, "r" ) ) == NULL )
+	if ( ( fpList = fopen( strAreaFile, "r" ) ) == NULL )
 	{
 	    perror( AREA_LIST );
 	    exit( 1 );
@@ -416,12 +419,13 @@ void boot_db()
 
 
 
-    sprintf( log_buf, "reading %s", strArea );
-    log_string( log_buf );
+                sprintf(strAreaFile, "%s%s", AREA_DIR, strArea);
+		sprintf( log_buf, "reading %s", strAreaFile );
+		log_string( log_buf );
 
-		if ( ( fpArea = fopen( strArea, "r" ) ) == NULL )
+		if ( ( fpArea = fopen( strAreaFile, "r" ) ) == NULL )
 		{
-		    perror( strArea );
+		    perror( strAreaFile );
 		    exit( 1 );
 		}
 	    }

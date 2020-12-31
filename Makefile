@@ -13,11 +13,11 @@ O_FILES = act_comm.o act_info.o act_wiz2.o auction.o bit.o const.o db.o fight.o 
 	 mem.o mob_prog.o olc_act.o olc_save.o repent.o sign.o string.o vehicle.o
 
 rom: $(O_FILES)
-	rm -f ../area/rom
-	$(CC) $(L_FLAGS) -o ../area/rom $(O_FILES) -lcrypt
+	rm -f ../bin/rom
+	$(CC) $(L_FLAGS) -o ../bin/rom $(O_FILES) -lcrypt
 
 clean:
-	rm -f *.o ../area/rom core
+	rm -f *.o ../bin/rom core
 
 .c.o: merc.h
 	$(CC) -c $(C_FLAGS) $<

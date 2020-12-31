@@ -6759,7 +6759,7 @@ void do_dupe(CHAR_DATA *ch, char *argument)
 #define CH(descriptor)  ((descriptor)->original ? \
 	      (descriptor)->original : (descriptor)->character)
 #define COPYOVER_FILE "copyover.data"
-#define EXE_FILE      "../area/ROT2"
+#define EXE_FILE      "../bin/rom"
 
 
 /*  Copyover - Original idea: Fusion of MUD++
@@ -6787,39 +6787,39 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 		perror ("do_copyover:fopen");
 		return;
 	}
-										
+
 	/* Consider changing all saved areas here, if you use OLC */
 	/* do_asave (NULL, ""); - autosave changed areas */
-										
+
 	sprintf (buf, "\n\r *** Copyover by %s - please remain seated! ***\n\r", ch->name);
-										
+
 	/* For each playing descriptor, save its state */
 	for (d = descriptor_list; d ; d = d_next)
 	{
 		CHAR_DATA * och = CH (d);
 		d_next = d->next; /* We delete from the list , so need to save this */
-										
-	if (!d->character || d->connected > CON_PLAYING) /* drop those logging on */
-	{
-	  write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting, come back in a few minutes\n\r",0);
-          close_socket (d); /* throw'em out */
+
+		if (!d->character || d->connected > CON_PLAYING) /* drop those logging on */
+		{
+		  write_to_descriptor(d->descriptor, "\n\rSorry, we are rebooting, come back in a few minutes\n\r",0);
+	          close_socket (d); /* throw'em out */
+		}
+		else
+		{
+			fprintf (fp, "%d %s %s\n", d->descriptor, och->name,d->host);
+			#if 0                /* This is not necessary for ROM */
+			if (och->level == 1)
+			{
+			    write_to_descriptor (d->descriptor, "Since you are level one, and level one characters do not save, you gain a free level!\n\r", 0);
+			    advance_level (och);
+			    och->level++; /* Advance_level doesn't do that */
+			}
+			#endif           
+			    save_char_obj (och);
+			    write_to_descriptor (d->descriptor, buf, 0);
+		}
 	}
-	else
-	{
-		fprintf (fp, "%d %s %s\n", d->descriptor, och->name,d->host);
-	#if 0                /* This is not necessary for ROM */
-	if (och->level == 1)
-	{
-	    write_to_descriptor (d->descriptor, "Since you are level one, and level one characters do not save, you gain a free level!\n\r", 0);
-	    advance_level (och);
-	    och->level++; /* Advance_level doesn't do that */
-	}
-	#endif           
-	    save_char_obj (och);
-	    write_to_descriptor (d->descriptor, buf, 0);
-	}
-	}
-										
+
 	fprintf (fp, "-1\n");
 	fclose (fp);
 
@@ -6830,12 +6830,12 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 	sprintf (buf, "%d", port);
 	sprintf (buf2, "%d", control);
 
+//	execl (EXE_FILE, "ROT2", buf, "copyover", buf2, (char *)NULL);
 	execl (EXE_FILE, "ROT2", buf, "copyover", buf2, (char *)NULL);
-
 	/* Failed - sucessful exec will not return */
 	perror ("do_copyover: execl");
 	send_to_char ("Copyover FAILED!\n\r",ch);
-										
+
 	/* Here you might want to reopen fpReserve */
 	fpReserve = fopen (NULL_FILE, "r");
 }

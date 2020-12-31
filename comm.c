@@ -469,12 +469,12 @@ int main( int argc, char **argv )
     	copyover_recover();
 
     game_loop_unix( control ); 
-#if !defined( WIN32 )
-    close( control );
-#else
-    closesocket( control );
-    WSACleanup();
-#endif
+  #if !defined( WIN32 )
+      close( control );
+  #else
+      closesocket( control );
+      WSACleanup();
+  #endif
 #endif
 
     /*

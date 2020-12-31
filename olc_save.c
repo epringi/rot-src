@@ -79,10 +79,10 @@ void save_area_list()
     FILE *fp;
     AREA_DATA *pArea;
 
-    if ( ( fp = fopen( "area.lst", "w" ) ) == NULL )
+    if ( ( fp = fopen( "../area/area.lst", "w" ) ) == NULL )
     {
 	bug( "Save_area_list: fopen", 0 );
-	perror( "area.lst" );
+	perror( "../area/area.lst" );
     }
     else
     {
@@ -90,11 +90,11 @@ void save_area_list()
 	 * Add any help files that need to be loaded at
 	 * startup to this section.
 	 */
-	fprintf( fp, "help.are\n"   );
-	fprintf( fp, "social.are\n" );    /* ROM OLC */
+	fprintf( fp, "../area/help.are\n"   );
+	fprintf( fp, "../area/social.are\n" );    /* ROM OLC */
 	for( pArea = area_first; pArea; pArea = pArea->next )
 	{
-	    fprintf( fp, "%s\n", pArea->file_name );
+	    fprintf( fp, "../area/%s\n", pArea->file_name );
 	}
 
 	fprintf( fp, "$\n" );

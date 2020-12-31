@@ -2988,6 +2988,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define PLAYER_DIR      "../player/"        	/* Player files */
 #define GOD_DIR         "../gods/"  		/* list of gods */
 #define DEITY_DIR	"../deity/"		/* dir for deity files */
+#define AREA_DIR	"../area/"		/* dir for area files */
 #define TEMP_FILE	"../player/romtmp"
 #define NULL_FILE	"/dev/null"		/* To reserve one stream */
 #endif
